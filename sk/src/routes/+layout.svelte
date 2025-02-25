@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "../app.css";
   import "../app.scss";
   import { base } from "$app/paths";
   import { page } from "$app/stores";
