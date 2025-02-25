@@ -50,8 +50,8 @@ Make sure your Docker daemon is running then complete the following steps:
    and edit it to your taste before proceeding.
    And then just run `docker compose up -d`.
 2. Open a new terminal and navigate to the `/sk` directory. Install dependencies by
-   running `npx pnpm install`
-3. In the same terminal, after the dependencies are installed, run the command `npm run dev:backend`
+   running `bun install`
+3. In the same terminal, after the dependencies are installed, run the command `bun run dev:backend`
    This runs `go build` in the `/pb` directory and runs `modd` for live development on a
    backend server
 4. Open a seperate terminal, navigate to the `/sk` directory, and run the command `npm run dev`.
@@ -72,8 +72,8 @@ This method is a good alternative for simple use cases that don't use either Doc
      - _For Mac:_ _Please contribute_
 4. Set up the frontend
    - Open a new terminal, navigate to the `/sk` directory and run the following
-     - First install dependencies using `npx pnpm install`
-     - Then, `npm run dev`
+     - First install dependencies using `bun install`
+     - Then, `bun run dev`
 5. Extend JavaScript by [checking out this documentation here.](https://pocketbase.io/docs/js-overview/).
 
 ## With Go Tools

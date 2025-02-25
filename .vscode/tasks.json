@@ -24,7 +24,7 @@
         {
             "label": "Install Frontend Dependencies",
             "type": "shell",
-            "command": "cd sk && npx pnpm install",
+            "command": "cd sk && bun install",
             "dependsOn": ["Start Docker Containers"],
             "problemMatcher": []
         },
@@ -62,7 +62,7 @@
         {
             "label": "Start Frontend Dev Server",
             "type": "shell",
-            "command": "cd sk && npm run dev",
+            "command": "cd sk && bun run dev",
             "dependsOn": ["Start Backend Dev Server"],
             "isBackground": true,
             "presentation": {
