@@ -7,14 +7,20 @@
 node_modules/
 
 # Ignore environment and history files
-.env
+#.env*
 .ash_history
 
 # Ignore Docker override file (if not critical)
 docker-compose.override.yml
 
-# Ignore workspace configuration files
+# Ignore workspace and editor configuration files
 *.code-workspace
+.vscode/
+
+# Ignore package manager lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # Ignore binaries, databases, and compressed archives
 *.zip
@@ -30,6 +36,11 @@ docker-compose.override.yml
 *.bmp
 *.svg
 
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
 # Ignore entire pb_data directory (contains generated data, logs, and storage binaries)
 pb/pb_data/
 
@@ -37,3 +48,4 @@ pb/pb_data/
 /build/
 /dist/
 /tmp/
+/.svelte-kit/
