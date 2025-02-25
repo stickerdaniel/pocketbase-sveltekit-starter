@@ -2,6 +2,16 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Run AI Digest",
+            "type": "shell",
+            "command": "npx --yes ai-digest",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
             "label": "Initialize Project",
             "type": "shell",
             "command": "[ -f .env.example ] && cp -n .env.example .env || echo '.env.example not found'; [ -f docker-compose.override.yml.example ] && cp -n docker-compose.override.yml.example docker-compose.override.yml || echo 'docker-compose.override.yml.example not found'",
