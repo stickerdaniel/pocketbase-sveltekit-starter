@@ -1,8 +1,39 @@
+# .aidigestignore
+
+# Ignore cache and local directories
 .cache
 .local
 .npm
+node_modules/
+
+# Ignore environment and history files
 .env
 .ash_history
-/docker-compose.override.yml
-pbsk.code-workspace
 
+# Ignore Docker override file (if not critical)
+docker-compose.override.yml
+
+# Ignore workspace configuration files
+*.code-workspace
+
+# Ignore binaries, databases, and compressed archives
+*.zip
+*.db
+*.exe
+*.bin
+
+# Ignore image and media assets
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+
+# Ignore entire pb_data directory (contains generated data, logs, and storage binaries)
+pb/pb_data/
+
+# Ignore build artifacts and temporary directories
+/build/
+/dist/
+/tmp/
