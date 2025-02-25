@@ -54,7 +54,7 @@ Make sure your Docker daemon is running then complete the following steps:
 3. In the same terminal, after the dependencies are installed, run the command `bun run dev:backend`
    This runs `go build` in the `/pb` directory and runs `modd` for live development on a
    backend server
-4. Open a seperate terminal, navigate to the `/sk` directory, and run the command `npm run dev`.
+4. Open a seperate terminal, navigate to the `/sk` directory, and run the command `bun run dev`.
    This starts the frontend dev server.
 5. Both sides are working if you navigate to the "Hello" page on the development server
    and there is an API response that says "Hello World!"
@@ -67,7 +67,7 @@ This method is a good alternative for simple use cases that don't use either Doc
    - The versions support Darwin, Linux, and Windows. Make sure that you download the correct version that supports itself within the OS that you are using.
 2. Extract the `pocketbase.exe` from the `.zip` file you downloaded into the `/pb` folder within your project.
 3. Set up the backend
-   - Open a new terminal, navigate to the `/sk` directory and run the command `npm run backend`
+   - Open a new terminal, navigate to the `/sk` directory and run the command `bun run backend`
      - _For Windows:_ You will have to edit the `"backend"` script in the `./sk/package.json` file to `cd .. && cd pb && pocketbase serve --publicDir=../sk/build`
      - _For Mac:_ _Please contribute_
 4. Set up the frontend
