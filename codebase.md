@@ -1867,13 +1867,6 @@ vite.config.ts.timestamp-*
 
 ```
 
-# sk/.npmrc
-
-```
-engine-strict=true
-
-```
-
 # sk/.prettierignore
 
 ```
@@ -1959,6 +1952,7 @@ yarn.lock
     "autoprefixer": "^10.4.20",
     "bits-ui": "^1.3.4",
     "clsx": "^2.1.1",
+    "lucide-svelte": "^0.476.0",
     "pocketbase-typegen": "^1.2.1",
     "prettier": "^3.1.1",
     "prettier-plugin-svelte": "^3.1.2",
@@ -2409,6 +2403,191 @@ export function reroute({ url }) {
     border-left-color: var(--variable);
   }
 </style>
+
+```
+
+# sk/src/lib/components/app-sidebar.svelte
+
+```svelte
+<script lang="ts" module>
+	import BookOpen from "lucide-svelte/icons/book-open";
+	import Bot from "lucide-svelte/icons/bot";
+	import ChartPie from "lucide-svelte/icons/chart-pie";
+	import Frame from "lucide-svelte/icons/frame";
+	import LifeBuoy from "lucide-svelte/icons/life-buoy";
+	import Map from "lucide-svelte/icons/map";
+	import Send from "lucide-svelte/icons/send";
+	import Settings2 from "lucide-svelte/icons/settings-2";
+	import SquareTerminal from "lucide-svelte/icons/square-terminal";
+
+	const data = {
+		user: {
+			name: "shadcn",
+			email: "m@example.com",
+			avatar: "/avatars/shadcn.jpg",
+		},
+		navMain: [
+			{
+				title: "Playground",
+				url: "#",
+				icon: SquareTerminal,
+				isActive: true,
+				items: [
+					{
+						title: "History",
+						url: "#",
+					},
+					{
+						title: "Starred",
+						url: "#",
+					},
+					{
+						title: "Settings",
+						url: "#",
+					},
+				],
+			},
+			{
+				title: "Models",
+				url: "#",
+				icon: Bot,
+				items: [
+					{
+						title: "Genesis",
+						url: "#",
+					},
+					{
+						title: "Explorer",
+						url: "#",
+					},
+					{
+						title: "Quantum",
+						url: "#",
+					},
+				],
+			},
+			{
+				title: "Documentation",
+				url: "#",
+				icon: BookOpen,
+				items: [
+					{
+						title: "Introduction",
+						url: "#",
+					},
+					{
+						title: "Get Started",
+						url: "#",
+					},
+					{
+						title: "Tutorials",
+						url: "#",
+					},
+					{
+						title: "Changelog",
+						url: "#",
+					},
+				],
+			},
+			{
+				title: "Settings",
+				url: "#",
+				icon: Settings2,
+				items: [
+					{
+						title: "General",
+						url: "#",
+					},
+					{
+						title: "Team",
+						url: "#",
+					},
+					{
+						title: "Billing",
+						url: "#",
+					},
+					{
+						title: "Limits",
+						url: "#",
+					},
+				],
+			},
+		],
+		navSecondary: [
+			{
+				title: "Support",
+				url: "#",
+				icon: LifeBuoy,
+			},
+			{
+				title: "Feedback",
+				url: "#",
+				icon: Send,
+			},
+		],
+		projects: [
+			{
+				name: "Design Engineering",
+				url: "#",
+				icon: Frame,
+			},
+			{
+				name: "Sales & Marketing",
+				url: "#",
+				icon: ChartPie,
+			},
+			{
+				name: "Travel",
+				url: "#",
+				icon: Map,
+			},
+		],
+	};
+</script>
+
+<script lang="ts">
+	import NavMain from "$lib/components/nav-main.svelte";
+	import NavProjects from "$lib/components/nav-projects.svelte";
+	import NavSecondary from "$lib/components/nav-secondary.svelte";
+	import NavUser from "$lib/components/nav-user.svelte";
+	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+	import Command from "lucide-svelte/icons/command";
+	import type { ComponentProps } from "svelte";
+
+	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
+</script>
+
+<Sidebar.Root bind:ref variant="inset" {...restProps}>
+	<Sidebar.Header>
+		<Sidebar.Menu>
+			<Sidebar.MenuItem>
+				<Sidebar.MenuButton size="lg">
+					{#snippet child({ props })}
+						<a href="##" {...props}>
+							<div
+								class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
+							>
+								<Command class="size-4" />
+							</div>
+							<div class="grid flex-1 text-left text-sm leading-tight">
+								<span class="truncate font-semibold">Acme Inc</span>
+								<span class="truncate text-xs">Enterprise</span>
+							</div>
+						</a>
+					{/snippet}
+				</Sidebar.MenuButton>
+			</Sidebar.MenuItem>
+		</Sidebar.Menu>
+	</Sidebar.Header>
+	<Sidebar.Content>
+		<NavMain items={data.navMain} />
+		<NavProjects projects={data.projects} />
+		<NavSecondary items={data.navSecondary} class="mt-auto" />
+	</Sidebar.Content>
+	<Sidebar.Footer>
+		<NavUser user={data.user} />
+	</Sidebar.Footer>
+</Sidebar.Root>
 
 ```
 
@@ -3002,6 +3181,311 @@ export function reroute({ url }) {
 
 ```
 
+# sk/src/lib/components/nav-main.svelte
+
+```svelte
+<script lang="ts">
+	import * as Collapsible from "$lib/components/ui/collapsible/index.js";
+	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+	import ChevronRight from "lucide-svelte/icons/chevron-right";
+
+	let {
+		items,
+	}: {
+		items: {
+			title: string;
+			url: string;
+			// This should be `Component` after lucide-svelte updates types
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			icon: any;
+			isActive?: boolean;
+			items?: {
+				title: string;
+				url: string;
+			}[];
+		}[];
+	} = $props();
+</script>
+
+<Sidebar.Group>
+	<Sidebar.GroupLabel>Platform</Sidebar.GroupLabel>
+	<Sidebar.Menu>
+		{#each items as mainItem (mainItem.title)}
+			<Collapsible.Root open={mainItem.isActive}>
+				{#snippet child({ props })}
+					<Sidebar.MenuItem {...props}>
+						<Sidebar.MenuButton>
+							{#snippet tooltipContent()}
+								{mainItem.title}
+							{/snippet}
+							{#snippet child({ props })}
+								<a href={mainItem.url} {...props}>
+									<mainItem.icon />
+									<span>{mainItem.title}</span>
+								</a>
+							{/snippet}
+						</Sidebar.MenuButton>
+						{#if mainItem.items?.length}
+							<Collapsible.Trigger>
+								{#snippet child({ props })}
+									<Sidebar.MenuAction
+										{...props}
+										class="data-[state=open]:rotate-90"
+									>
+										<ChevronRight />
+										<span class="sr-only">Toggle</span>
+									</Sidebar.MenuAction>
+								{/snippet}
+							</Collapsible.Trigger>
+							<Collapsible.Content>
+								<Sidebar.MenuSub>
+									{#each mainItem.items as subItem (subItem.title)}
+										<Sidebar.MenuSubItem>
+											<Sidebar.MenuSubButton href={subItem.url}>
+												<span>{subItem.title}</span>
+											</Sidebar.MenuSubButton>
+										</Sidebar.MenuSubItem>
+									{/each}
+								</Sidebar.MenuSub>
+							</Collapsible.Content>
+						{/if}
+					</Sidebar.MenuItem>
+				{/snippet}
+			</Collapsible.Root>
+		{/each}
+	</Sidebar.Menu>
+</Sidebar.Group>
+
+```
+
+# sk/src/lib/components/nav-projects.svelte
+
+```svelte
+<script lang="ts">
+	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+	import { useSidebar } from "$lib/components/ui/sidebar/index.js";
+	import Ellipsis from "lucide-svelte/icons/ellipsis";
+	import Folder from "lucide-svelte/icons/folder";
+	import Share from "lucide-svelte/icons/share";
+	import Trash2 from "lucide-svelte/icons/trash-2";
+
+	let {
+		projects,
+	}: {
+		projects: {
+			name: string;
+			url: string;
+			// This should be `Component` after lucide-svelte updates types
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			icon: any;
+		}[];
+	} = $props();
+
+	const sidebar = useSidebar();
+</script>
+
+<Sidebar.Group class="group-data-[collapsible=icon]:hidden">
+	<Sidebar.GroupLabel>Projects</Sidebar.GroupLabel>
+	<Sidebar.Menu>
+		{#each projects as item (item.name)}
+			<Sidebar.MenuItem>
+				<Sidebar.MenuButton>
+					{#snippet child({ props })}
+						<a href={item.url} {...props}>
+							<item.icon />
+							<span>{item.name}</span>
+						</a>
+					{/snippet}
+				</Sidebar.MenuButton>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger>
+						{#snippet child({ props })}
+							<Sidebar.MenuAction showOnHover {...props}>
+								<Ellipsis />
+								<span class="sr-only">More</span>
+							</Sidebar.MenuAction>
+						{/snippet}
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content
+						class="w-48"
+						side={sidebar.isMobile ? "bottom" : "right"}
+						align={sidebar.isMobile ? "end" : "start"}
+					>
+						<DropdownMenu.Item>
+							<Folder class="text-muted-foreground" />
+							<span>View Project</span>
+						</DropdownMenu.Item>
+						<DropdownMenu.Item>
+							<Share class="text-muted-foreground" />
+							<span>Share Project</span>
+						</DropdownMenu.Item>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item>
+							<Trash2 class="text-muted-foreground" />
+							<span>Delete Project</span>
+						</DropdownMenu.Item>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</Sidebar.MenuItem>
+		{/each}
+		<Sidebar.MenuItem>
+			<Sidebar.MenuButton>
+				<Ellipsis />
+				<span>More</span>
+			</Sidebar.MenuButton>
+		</Sidebar.MenuItem>
+	</Sidebar.Menu>
+</Sidebar.Group>
+
+```
+
+# sk/src/lib/components/nav-secondary.svelte
+
+```svelte
+<script lang="ts">
+	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+	import type { ComponentProps } from "svelte";
+
+	let {
+		ref = $bindable(null),
+		items,
+		...restProps
+	}: {
+		items: {
+			title: string;
+			url: string;
+			// This should be `Component` after lucide-svelte updates types
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			icon: any;
+		}[];
+	} & ComponentProps<typeof Sidebar.Group> = $props();
+</script>
+
+<Sidebar.Group bind:ref {...restProps}>
+	<Sidebar.GroupContent>
+		<Sidebar.Menu>
+			{#each items as item (item.title)}
+				<Sidebar.MenuItem>
+					<Sidebar.MenuButton size="sm">
+						{#snippet child({ props })}
+							<a href={item.url} {...props}>
+								<item.icon />
+								<span>{item.title}</span>
+							</a>
+						{/snippet}
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+			{/each}
+		</Sidebar.Menu>
+	</Sidebar.GroupContent>
+</Sidebar.Group>
+
+```
+
+# sk/src/lib/components/nav-user.svelte
+
+```svelte
+<script lang="ts">
+	import BadgeCheck from "lucide-svelte/icons/badge-check";
+	import Bell from "lucide-svelte/icons/bell";
+	import ChevronsUpDown from "lucide-svelte/icons/chevrons-up-down";
+	import CreditCard from "lucide-svelte/icons/credit-card";
+	import LogOut from "lucide-svelte/icons/log-out";
+	import Sparkles from "lucide-svelte/icons/sparkles";
+
+	import * as Avatar from "$lib/components/ui/avatar/index.js";
+	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+	import { useSidebar } from "$lib/components/ui/sidebar/index.js";
+
+	let {
+		user,
+	}: {
+		user: {
+			name: string;
+			email: string;
+			avatar: string;
+		};
+	} = $props();
+
+	const sidebar = useSidebar();
+</script>
+
+<Sidebar.Menu>
+	<Sidebar.MenuItem>
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger>
+				{#snippet child({ props })}
+					<Sidebar.MenuButton
+						{...props}
+						size="lg"
+						class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+					>
+						<Avatar.Root class="h-8 w-8 rounded-lg">
+							<Avatar.Image src={user.avatar} alt={user.name} />
+							<Avatar.Fallback class="rounded-lg">CN</Avatar.Fallback>
+						</Avatar.Root>
+						<div class="grid flex-1 text-left text-sm leading-tight">
+							<span class="truncate font-semibold">{user.name}</span>
+							<span class="truncate text-xs">{user.email}</span>
+						</div>
+						<ChevronsUpDown class="ml-auto size-4" />
+					</Sidebar.MenuButton>
+				{/snippet}
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content
+				class="w-[--bits-dropdown-menu-anchor-width] min-w-56 rounded-lg"
+				side={sidebar.isMobile ? "bottom" : "right"}
+				align="end"
+				sideOffset={4}
+			>
+				<DropdownMenu.Label class="p-0 font-normal">
+					<div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+						<Avatar.Root class="h-8 w-8 rounded-lg">
+							<Avatar.Image src={user.avatar} alt={user.name} />
+							<Avatar.Fallback class="rounded-lg">CN</Avatar.Fallback>
+						</Avatar.Root>
+						<div class="grid flex-1 text-left text-sm leading-tight">
+							<span class="truncate font-semibold">{user.name}</span>
+							<span class="truncate text-xs">{user.email}</span>
+						</div>
+					</div>
+				</DropdownMenu.Label>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Group>
+					<DropdownMenu.Item>
+						<Sparkles />
+						Upgrade to Pro
+					</DropdownMenu.Item>
+				</DropdownMenu.Group>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Group>
+					<DropdownMenu.Item>
+						<BadgeCheck />
+						Account
+					</DropdownMenu.Item>
+					<DropdownMenu.Item>
+						<CreditCard />
+						Billing
+					</DropdownMenu.Item>
+					<DropdownMenu.Item>
+						<Bell />
+						Notifications
+					</DropdownMenu.Item>
+				</DropdownMenu.Group>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item>
+					<LogOut />
+					Log out
+				</DropdownMenu.Item>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+	</Sidebar.MenuItem>
+</Sidebar.Menu>
+
+```
+
 # sk/src/lib/components/Nav.svelte
 
 ```svelte
@@ -3046,6 +3530,49 @@ export function reroute({ url }) {
     }
   }
 </style>
+
+```
+
+# sk/src/lib/components/sidebar-page.svelte
+
+```svelte
+<script lang="ts">
+	import AppSidebar from "$lib/components/app-sidebar.svelte";
+	import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
+	import { Separator } from "$lib/components/ui/separator/index.js";
+	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+</script>
+
+<Sidebar.Provider>
+	<AppSidebar />
+	<Sidebar.Inset>
+		<header class="flex h-16 shrink-0 items-center gap-2">
+			<div class="flex items-center gap-2 px-4">
+				<Sidebar.Trigger class="-ml-1" />
+				<Separator orientation="vertical" class="mr-2 h-4" />
+				<Breadcrumb.Root>
+					<Breadcrumb.List>
+						<Breadcrumb.Item class="hidden md:block">
+							<Breadcrumb.Link href="#">Building Your Application</Breadcrumb.Link>
+						</Breadcrumb.Item>
+						<Breadcrumb.Separator class="hidden md:block" />
+						<Breadcrumb.Item>
+							<Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
+						</Breadcrumb.Item>
+					</Breadcrumb.List>
+				</Breadcrumb.Root>
+			</div>
+		</header>
+		<div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+			<div class="grid auto-rows-min gap-4 md:grid-cols-3">
+				<div class="bg-muted/50 aspect-video rounded-xl"></div>
+				<div class="bg-muted/50 aspect-video rounded-xl"></div>
+				<div class="bg-muted/50 aspect-video rounded-xl"></div>
+			</div>
+			<div class="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min"></div>
+		</div>
+	</Sidebar.Inset>
+</Sidebar.Provider>
 
 ```
 
@@ -3256,6 +3783,328 @@ Example:
     margin-bottom: 1rem;
   }
 </style>
+
+```
+
+# sk/src/lib/components/ui/avatar/avatar-fallback.svelte
+
+```svelte
+<script lang="ts">
+	import { Avatar as AvatarPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		class: className,
+		ref = $bindable(null),
+		...restProps
+	}: AvatarPrimitive.FallbackProps = $props();
+</script>
+
+<AvatarPrimitive.Fallback
+	bind:ref
+	class={cn("bg-muted flex size-full items-center justify-center", className)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/avatar/avatar-image.svelte
+
+```svelte
+<script lang="ts">
+	import { Avatar as AvatarPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		class: className,
+		src,
+		alt,
+		ref = $bindable(null),
+		...restProps
+	}: AvatarPrimitive.ImageProps = $props();
+</script>
+
+<AvatarPrimitive.Image
+	bind:ref
+	{src}
+	{alt}
+	class={cn("aspect-square size-full", className)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/avatar/avatar.svelte
+
+```svelte
+<script lang="ts">
+	import { Avatar as AvatarPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		class: className,
+		ref = $bindable(null),
+		loadingStatus = $bindable("loading"),
+		...restProps
+	}: AvatarPrimitive.RootProps = $props();
+</script>
+
+<AvatarPrimitive.Root
+	bind:loadingStatus
+	bind:ref
+	class={cn("relative flex size-10 shrink-0 overflow-hidden rounded-full", className)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/avatar/index.ts
+
+```ts
+import Root from "./avatar.svelte";
+import Image from "./avatar-image.svelte";
+import Fallback from "./avatar-fallback.svelte";
+
+export {
+	Root,
+	Image,
+	Fallback,
+	//
+	Root as Avatar,
+	Image as AvatarImage,
+	Fallback as AvatarFallback,
+};
+
+```
+
+# sk/src/lib/components/ui/breadcrumb/breadcrumb-ellipsis.svelte
+
+```svelte
+<script lang="ts">
+	import Ellipsis from "lucide-svelte/icons/ellipsis";
+	import type { WithElementRef, WithoutChildren } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: WithoutChildren<WithElementRef<HTMLAttributes<HTMLSpanElement>>> = $props();
+</script>
+
+<span
+	bind:this={ref}
+	role="presentation"
+	aria-hidden="true"
+	class={cn("flex size-9 items-center justify-center", className)}
+	{...restProps}
+>
+	<Ellipsis class="size-4" />
+	<span class="sr-only">More</span>
+</span>
+
+```
+
+# sk/src/lib/components/ui/breadcrumb/breadcrumb-item.svelte
+
+```svelte
+<script lang="ts">
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLLiAttributes } from "svelte/elements";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLLiAttributes> = $props();
+</script>
+
+<li bind:this={ref} class={cn("inline-flex items-center gap-1.5", className)} {...restProps}>
+	{@render children?.()}
+</li>
+
+```
+
+# sk/src/lib/components/ui/breadcrumb/breadcrumb-link.svelte
+
+```svelte
+<script lang="ts">
+	import type { HTMLAnchorAttributes } from "svelte/elements";
+	import type { Snippet } from "svelte";
+	import type { WithElementRef } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		href = undefined,
+		child,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAnchorAttributes> & {
+		child?: Snippet<[{ props: HTMLAnchorAttributes }]>;
+	} = $props();
+
+	const attrs = $derived({
+		class: cn("hover:text-foreground transition-colors", className),
+		href,
+		...restProps,
+	});
+</script>
+
+{#if child}
+	{@render child({ props: attrs })}
+{:else}
+	<a bind:this={ref} {...attrs}>
+		{@render children?.()}
+	</a>
+{/if}
+
+```
+
+# sk/src/lib/components/ui/breadcrumb/breadcrumb-list.svelte
+
+```svelte
+<script lang="ts">
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLOlAttributes } from "svelte/elements";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLOlAttributes> = $props();
+</script>
+
+<ol
+	bind:this={ref}
+	class={cn(
+		"text-muted-foreground flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+</ol>
+
+```
+
+# sk/src/lib/components/ui/breadcrumb/breadcrumb-page.svelte
+
+```svelte
+<script lang="ts">
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLSpanElement>> = $props();
+</script>
+
+<span
+	bind:this={ref}
+	role="link"
+	aria-disabled="true"
+	aria-current="page"
+	class={cn("text-foreground font-normal", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</span>
+
+```
+
+# sk/src/lib/components/ui/breadcrumb/breadcrumb-separator.svelte
+
+```svelte
+<script lang="ts">
+	import ChevronRight from "lucide-svelte/icons/chevron-right";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLLiAttributes } from "svelte/elements";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLLiAttributes> = $props();
+</script>
+
+<li
+	role="presentation"
+	aria-hidden="true"
+	class={cn("[&>svg]:size-3.5", className)}
+	bind:this={ref}
+	{...restProps}
+>
+	{#if children}
+		{@render children?.()}
+	{:else}
+		<ChevronRight />
+	{/if}
+</li>
+
+```
+
+# sk/src/lib/components/ui/breadcrumb/breadcrumb.svelte
+
+```svelte
+<script lang="ts">
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLElement>> = $props();
+</script>
+
+<nav class={className} bind:this={ref} aria-label="breadcrumb" {...restProps}>
+	{@render children?.()}
+</nav>
+
+```
+
+# sk/src/lib/components/ui/breadcrumb/index.ts
+
+```ts
+import Root from "./breadcrumb.svelte";
+import Ellipsis from "./breadcrumb-ellipsis.svelte";
+import Item from "./breadcrumb-item.svelte";
+import Separator from "./breadcrumb-separator.svelte";
+import Link from "./breadcrumb-link.svelte";
+import List from "./breadcrumb-list.svelte";
+import Page from "./breadcrumb-page.svelte";
+
+export {
+	Root,
+	Ellipsis,
+	Item,
+	Separator,
+	Link,
+	List,
+	Page,
+	//
+	Root as Breadcrumb,
+	Ellipsis as BreadcrumbEllipsis,
+	Item as BreadcrumbItem,
+	Separator as BreadcrumbSeparator,
+	Link as BreadcrumbLink,
+	List as BreadcrumbList,
+	Page as BreadcrumbPage,
+};
 
 ```
 
@@ -3536,6 +4385,388 @@ export {
 
 ```
 
+# sk/src/lib/components/ui/collapsible/index.ts
+
+```ts
+import { Collapsible as CollapsiblePrimitive } from "bits-ui";
+
+const Root: typeof CollapsiblePrimitive.Root = CollapsiblePrimitive.Root;
+const Trigger: typeof CollapsiblePrimitive.Trigger = CollapsiblePrimitive.Trigger;
+const Content: typeof CollapsiblePrimitive.Content = CollapsiblePrimitive.Content;
+
+export {
+	Root,
+	Content,
+	Trigger,
+	//
+	Root as Collapsible,
+	Content as CollapsibleContent,
+	Trigger as CollapsibleTrigger,
+};
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-checkbox-item.svelte
+
+```svelte
+<script lang="ts">
+	import { DropdownMenu as DropdownMenuPrimitive, type WithoutChildrenOrChild } from "bits-ui";
+	import Check from "lucide-svelte/icons/check";
+	import Minus from "lucide-svelte/icons/minus";
+	import { cn } from "$lib/utils.js";
+	import type { Snippet } from "svelte";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children: childrenProp,
+		checked = $bindable(false),
+		indeterminate = $bindable(false),
+		...restProps
+	}: WithoutChildrenOrChild<DropdownMenuPrimitive.CheckboxItemProps> & {
+		children?: Snippet;
+	} = $props();
+</script>
+
+<DropdownMenuPrimitive.CheckboxItem
+	bind:ref
+	bind:checked
+	bind:indeterminate
+	class={cn(
+		"data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+		className
+	)}
+	{...restProps}
+>
+	{#snippet children({ checked, indeterminate })}
+		<span class="absolute left-2 flex size-3.5 items-center justify-center">
+			{#if indeterminate}
+				<Minus class="size-4" />
+			{:else}
+				<Check class={cn("size-4", !checked && "text-transparent")} />
+			{/if}
+		</span>
+		{@render childrenProp?.()}
+	{/snippet}
+</DropdownMenuPrimitive.CheckboxItem>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-content.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		sideOffset = 4,
+		portalProps,
+		...restProps
+	}: DropdownMenuPrimitive.ContentProps & {
+		portalProps?: DropdownMenuPrimitive.PortalProps;
+	} = $props();
+</script>
+
+<DropdownMenuPrimitive.Portal {...portalProps}>
+	<DropdownMenuPrimitive.Content
+		bind:ref
+		{sideOffset}
+		class={cn(
+			"bg-popover text-popover-foreground z-50 min-w-[8rem] overflow-hidden rounded-md border p-1 shadow-md",
+			"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 outline-none",
+			className
+		)}
+		{...restProps}
+	/>
+</DropdownMenuPrimitive.Portal>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-group-heading.svelte
+
+```svelte
+<script lang="ts">
+	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		inset,
+		...restProps
+	}: DropdownMenuPrimitive.GroupHeadingProps & {
+		inset?: boolean;
+	} = $props();
+</script>
+
+<DropdownMenuPrimitive.GroupHeading
+	bind:ref
+	class={cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-item.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		inset,
+		...restProps
+	}: DropdownMenuPrimitive.ItemProps & {
+		inset?: boolean;
+	} = $props();
+</script>
+
+<DropdownMenuPrimitive.Item
+	bind:ref
+	class={cn(
+		"data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
+		inset && "pl-8",
+		className
+	)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-label.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import { type WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		inset,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
+		inset?: boolean;
+	} = $props();
+</script>
+
+<div
+	bind:this={ref}
+	class={cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-radio-item.svelte
+
+```svelte
+<script lang="ts">
+	import { DropdownMenu as DropdownMenuPrimitive, type WithoutChild } from "bits-ui";
+	import Circle from "lucide-svelte/icons/circle";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children: childrenProp,
+		...restProps
+	}: WithoutChild<DropdownMenuPrimitive.RadioItemProps> = $props();
+</script>
+
+<DropdownMenuPrimitive.RadioItem
+	bind:ref
+	class={cn(
+		"data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+		className
+	)}
+	{...restProps}
+>
+	{#snippet children({ checked })}
+		<span class="absolute left-2 flex size-3.5 items-center justify-center">
+			{#if checked}
+				<Circle class="size-2 fill-current" />
+			{/if}
+		</span>
+		{@render childrenProp?.({ checked })}
+	{/snippet}
+</DropdownMenuPrimitive.RadioItem>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte
+
+```svelte
+<script lang="ts">
+	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: DropdownMenuPrimitive.SeparatorProps = $props();
+</script>
+
+<DropdownMenuPrimitive.Separator
+	bind:ref
+	class={cn("bg-muted -mx-1 my-1 h-px", className)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-shortcut.svelte
+
+```svelte
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import { type WithElementRef } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLSpanElement>> = $props();
+</script>
+
+<span
+	bind:this={ref}
+	class={cn("ml-auto text-xs tracking-widest opacity-60", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</span>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-sub-content.svelte
+
+```svelte
+<script lang="ts">
+	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: DropdownMenuPrimitive.SubContentProps = $props();
+</script>
+
+<DropdownMenuPrimitive.SubContent
+	bind:ref
+	class={cn(
+		"bg-popover text-popover-foreground z-50 min-w-[8rem] rounded-md border p-1 shadow-lg focus:outline-none",
+		className
+	)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/dropdown-menu-sub-trigger.svelte
+
+```svelte
+<script lang="ts">
+	import { DropdownMenu as DropdownMenuPrimitive, type WithoutChild } from "bits-ui";
+	import ChevronRight from "lucide-svelte/icons/chevron-right";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		inset,
+		children,
+		...restProps
+	}: WithoutChild<DropdownMenuPrimitive.SubTriggerProps> & {
+		inset?: boolean;
+	} = $props();
+</script>
+
+<DropdownMenuPrimitive.SubTrigger
+	bind:ref
+	class={cn(
+		"data-[highlighted]:bg-accent data-[state=open]:bg-accent flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+		inset && "pl-8",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+	<ChevronRight class="ml-auto" />
+</DropdownMenuPrimitive.SubTrigger>
+
+```
+
+# sk/src/lib/components/ui/dropdown-menu/index.ts
+
+```ts
+import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
+import CheckboxItem from "./dropdown-menu-checkbox-item.svelte";
+import Content from "./dropdown-menu-content.svelte";
+import GroupHeading from "./dropdown-menu-group-heading.svelte";
+import Item from "./dropdown-menu-item.svelte";
+import Label from "./dropdown-menu-label.svelte";
+import RadioItem from "./dropdown-menu-radio-item.svelte";
+import Separator from "./dropdown-menu-separator.svelte";
+import Shortcut from "./dropdown-menu-shortcut.svelte";
+import SubContent from "./dropdown-menu-sub-content.svelte";
+import SubTrigger from "./dropdown-menu-sub-trigger.svelte";
+
+const Sub = DropdownMenuPrimitive.Sub;
+const Root = DropdownMenuPrimitive.Root;
+const Trigger = DropdownMenuPrimitive.Trigger;
+const Group = DropdownMenuPrimitive.Group;
+const RadioGroup = DropdownMenuPrimitive.RadioGroup;
+
+export {
+	CheckboxItem,
+	Content,
+	Root as DropdownMenu,
+	CheckboxItem as DropdownMenuCheckboxItem,
+	Content as DropdownMenuContent,
+	Group as DropdownMenuGroup,
+	GroupHeading as DropdownMenuGroupHeading,
+	Item as DropdownMenuItem,
+	Label as DropdownMenuLabel,
+	RadioGroup as DropdownMenuRadioGroup,
+	RadioItem as DropdownMenuRadioItem,
+	Separator as DropdownMenuSeparator,
+	Shortcut as DropdownMenuShortcut,
+	Sub as DropdownMenuSub,
+	SubContent as DropdownMenuSubContent,
+	SubTrigger as DropdownMenuSubTrigger,
+	Trigger as DropdownMenuTrigger,
+	Group,
+	GroupHeading,
+	Item,
+	Label,
+	RadioGroup,
+	RadioItem,
+	Root,
+	Separator,
+	Shortcut,
+	Sub,
+	SubContent,
+	SubTrigger,
+	Trigger,
+};
+
+```
+
 # sk/src/lib/components/ui/input/index.ts
 
 ```ts
@@ -3636,6 +4867,1482 @@ export {
 	)}
 	{...restProps}
 />
+
+```
+
+# sk/src/lib/components/ui/separator/index.ts
+
+```ts
+import Root from "./separator.svelte";
+
+export {
+	Root,
+	//
+	Root as Separator,
+};
+
+```
+
+# sk/src/lib/components/ui/separator/separator.svelte
+
+```svelte
+<script lang="ts">
+	import { Separator as SeparatorPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		orientation = "horizontal",
+		...restProps
+	}: SeparatorPrimitive.RootProps = $props();
+</script>
+
+<SeparatorPrimitive.Root
+	bind:ref
+	class={cn(
+		"bg-border shrink-0",
+		orientation === "horizontal" ? "h-[1px] w-full" : "min-h-full w-[1px]",
+		className
+	)}
+	{orientation}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/sheet/index.ts
+
+```ts
+import { Dialog as SheetPrimitive } from "bits-ui";
+
+import Overlay from "./sheet-overlay.svelte";
+import Content from "./sheet-content.svelte";
+import Header from "./sheet-header.svelte";
+import Footer from "./sheet-footer.svelte";
+import Title from "./sheet-title.svelte";
+import Description from "./sheet-description.svelte";
+
+const Root = SheetPrimitive.Root;
+const Close = SheetPrimitive.Close;
+const Trigger = SheetPrimitive.Trigger;
+const Portal = SheetPrimitive.Portal;
+
+export {
+	Root,
+	Close,
+	Trigger,
+	Portal,
+	Overlay,
+	Content,
+	Header,
+	Footer,
+	Title,
+	Description,
+	//
+	Root as Sheet,
+	Close as SheetClose,
+	Trigger as SheetTrigger,
+	Portal as SheetPortal,
+	Overlay as SheetOverlay,
+	Content as SheetContent,
+	Header as SheetHeader,
+	Footer as SheetFooter,
+	Title as SheetTitle,
+	Description as SheetDescription,
+};
+
+```
+
+# sk/src/lib/components/ui/sheet/sheet-content.svelte
+
+```svelte
+<script lang="ts" module>
+	import { tv, type VariantProps } from "tailwind-variants";
+
+	export const sheetVariants = tv({
+		base: "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 gap-4 p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+		variants: {
+			side: {
+				top: "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 border-b",
+				bottom: "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 border-t",
+				left: "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
+				right: "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
+			},
+		},
+		defaultVariants: {
+			side: "right",
+		},
+	});
+
+	export type Side = VariantProps<typeof sheetVariants>["side"];
+</script>
+
+<script lang="ts">
+	import { Dialog as SheetPrimitive, type WithoutChildrenOrChild } from "bits-ui";
+	import X from "lucide-svelte/icons/x";
+	import type { Snippet } from "svelte";
+	import SheetOverlay from "./sheet-overlay.svelte";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		portalProps,
+		side = "right",
+		children,
+		...restProps
+	}: WithoutChildrenOrChild<SheetPrimitive.ContentProps> & {
+		portalProps?: SheetPrimitive.PortalProps;
+		side?: Side;
+		children: Snippet;
+	} = $props();
+</script>
+
+<SheetPrimitive.Portal {...portalProps}>
+	<SheetOverlay />
+	<SheetPrimitive.Content bind:ref class={cn(sheetVariants({ side }), className)} {...restProps}>
+		{@render children?.()}
+		<SheetPrimitive.Close
+			class="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none"
+		>
+			<X class="size-4" />
+			<span class="sr-only">Close</span>
+		</SheetPrimitive.Close>
+	</SheetPrimitive.Content>
+</SheetPrimitive.Portal>
+
+```
+
+# sk/src/lib/components/ui/sheet/sheet-description.svelte
+
+```svelte
+<script lang="ts">
+	import { Dialog as SheetPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: SheetPrimitive.DescriptionProps = $props();
+</script>
+
+<SheetPrimitive.Description
+	bind:ref
+	class={cn("text-muted-foreground text-sm", className)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/sheet/sheet-footer.svelte
+
+```svelte
+<script lang="ts">
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	class={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/sheet/sheet-header.svelte
+
+```svelte
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import type { WithElementRef } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	class={cn("flex flex-col space-y-2 text-center sm:text-left", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/sheet/sheet-overlay.svelte
+
+```svelte
+<script lang="ts">
+	import { Dialog as SheetPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: SheetPrimitive.OverlayProps = $props();
+</script>
+
+<SheetPrimitive.Overlay
+	bind:ref
+	class={cn(
+		"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0  fixed inset-0 z-50 bg-black/80",
+		className
+	)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/sheet/sheet-title.svelte
+
+```svelte
+<script lang="ts">
+	import { Dialog as SheetPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: SheetPrimitive.TitleProps = $props();
+</script>
+
+<SheetPrimitive.Title
+	bind:ref
+	class={cn("text-foreground text-lg font-semibold", className)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/sidebar/constants.ts
+
+```ts
+export const SIDEBAR_COOKIE_NAME = "sidebar:state";
+export const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
+export const SIDEBAR_WIDTH = "16rem";
+export const SIDEBAR_WIDTH_MOBILE = "18rem";
+export const SIDEBAR_WIDTH_ICON = "3rem";
+export const SIDEBAR_KEYBOARD_SHORTCUT = "b";
+
+```
+
+# sk/src/lib/components/ui/sidebar/context.svelte.ts
+
+```ts
+import { IsMobile } from "$lib/hooks/is-mobile.svelte.js";
+import { getContext, setContext } from "svelte";
+import { SIDEBAR_KEYBOARD_SHORTCUT } from "./constants.js";
+
+type Getter<T> = () => T;
+
+export type SidebarStateProps = {
+	/**
+	 * A getter function that returns the current open state of the sidebar.
+	 * We use a getter function here to support `bind:open` on the `Sidebar.Provider`
+	 * component.
+	 */
+	open: Getter<boolean>;
+
+	/**
+	 * A function that sets the open state of the sidebar. To support `bind:open`, we need
+	 * a source of truth for changing the open state to ensure it will be synced throughout
+	 * the sub-components and any `bind:` references.
+	 */
+	setOpen: (open: boolean) => void;
+};
+
+class SidebarState {
+	readonly props: SidebarStateProps;
+	open = $derived.by(() => this.props.open());
+	openMobile = $state(false);
+	setOpen: SidebarStateProps["setOpen"];
+	#isMobile: IsMobile;
+	state = $derived.by(() => (this.open ? "expanded" : "collapsed"));
+
+	constructor(props: SidebarStateProps) {
+		this.setOpen = props.setOpen;
+		this.#isMobile = new IsMobile();
+		this.props = props;
+	}
+
+	// Convenience getter for checking if the sidebar is mobile
+	// without this, we would need to use `sidebar.isMobile.current` everywhere
+	get isMobile() {
+		return this.#isMobile.current;
+	}
+
+	// Event handler to apply to the `<svelte:window>`
+	handleShortcutKeydown = (e: KeyboardEvent) => {
+		if (e.key === SIDEBAR_KEYBOARD_SHORTCUT && (e.metaKey || e.ctrlKey)) {
+			e.preventDefault();
+			this.toggle();
+		}
+	};
+
+	setOpenMobile = (value: boolean) => {
+		this.openMobile = value;
+	};
+
+	toggle = () => {
+		return this.#isMobile.current
+			? (this.openMobile = !this.openMobile)
+			: this.setOpen(!this.open);
+	};
+}
+
+const SYMBOL_KEY = "scn-sidebar";
+
+/**
+ * Instantiates a new `SidebarState` instance and sets it in the context.
+ *
+ * @param props The constructor props for the `SidebarState` class.
+ * @returns  The `SidebarState` instance.
+ */
+export function setSidebar(props: SidebarStateProps): SidebarState {
+	return setContext(Symbol.for(SYMBOL_KEY), new SidebarState(props));
+}
+
+/**
+ * Retrieves the `SidebarState` instance from the context. This is a class instance,
+ * so you cannot destructure it.
+ * @returns The `SidebarState` instance.
+ */
+export function useSidebar(): SidebarState {
+	return getContext(Symbol.for(SYMBOL_KEY));
+}
+
+```
+
+# sk/src/lib/components/ui/sidebar/index.ts
+
+```ts
+import { useSidebar } from "./context.svelte.js";
+import Content from "./sidebar-content.svelte";
+import Footer from "./sidebar-footer.svelte";
+import GroupAction from "./sidebar-group-action.svelte";
+import GroupContent from "./sidebar-group-content.svelte";
+import GroupLabel from "./sidebar-group-label.svelte";
+import Group from "./sidebar-group.svelte";
+import Header from "./sidebar-header.svelte";
+import Input from "./sidebar-input.svelte";
+import Inset from "./sidebar-inset.svelte";
+import MenuAction from "./sidebar-menu-action.svelte";
+import MenuBadge from "./sidebar-menu-badge.svelte";
+import MenuButton from "./sidebar-menu-button.svelte";
+import MenuItem from "./sidebar-menu-item.svelte";
+import MenuSkeleton from "./sidebar-menu-skeleton.svelte";
+import MenuSubButton from "./sidebar-menu-sub-button.svelte";
+import MenuSubItem from "./sidebar-menu-sub-item.svelte";
+import MenuSub from "./sidebar-menu-sub.svelte";
+import Menu from "./sidebar-menu.svelte";
+import Provider from "./sidebar-provider.svelte";
+import Rail from "./sidebar-rail.svelte";
+import Separator from "./sidebar-separator.svelte";
+import Trigger from "./sidebar-trigger.svelte";
+import Root from "./sidebar.svelte";
+
+export {
+	Content,
+	Footer,
+	Group,
+	GroupAction,
+	GroupContent,
+	GroupLabel,
+	Header,
+	Input,
+	Inset,
+	Menu,
+	MenuAction,
+	MenuBadge,
+	MenuButton,
+	MenuItem,
+	MenuSkeleton,
+	MenuSub,
+	MenuSubButton,
+	MenuSubItem,
+	Provider,
+	Rail,
+	Root,
+	Separator,
+	//
+	Root as Sidebar,
+	Content as SidebarContent,
+	Footer as SidebarFooter,
+	Group as SidebarGroup,
+	GroupAction as SidebarGroupAction,
+	GroupContent as SidebarGroupContent,
+	GroupLabel as SidebarGroupLabel,
+	Header as SidebarHeader,
+	Input as SidebarInput,
+	Inset as SidebarInset,
+	Menu as SidebarMenu,
+	MenuAction as SidebarMenuAction,
+	MenuBadge as SidebarMenuBadge,
+	MenuButton as SidebarMenuButton,
+	MenuItem as SidebarMenuItem,
+	MenuSkeleton as SidebarMenuSkeleton,
+	MenuSub as SidebarMenuSub,
+	MenuSubButton as SidebarMenuSubButton,
+	MenuSubItem as SidebarMenuSubItem,
+	Provider as SidebarProvider,
+	Rail as SidebarRail,
+	Separator as SidebarSeparator,
+	Trigger as SidebarTrigger,
+	Trigger,
+	useSidebar,
+};
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-content.svelte
+
+```svelte
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import type { WithElementRef } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-sidebar="content"
+	class={cn(
+		"flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-footer.svelte
+
+```svelte
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import type { WithElementRef } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-sidebar="footer"
+	class={cn("flex flex-col gap-2 p-2", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-group-action.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { Snippet } from "svelte";
+	import type { HTMLButtonAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		child,
+		...restProps
+	}: WithElementRef<HTMLButtonAttributes> & {
+		child?: Snippet<[{ props: Record<string, unknown> }]>;
+	} = $props();
+
+	const propObj = $derived({
+		class: cn(
+			"text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-none transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+			// Increases the hit area of the button on mobile.
+			"after:absolute after:-inset-2 after:md:hidden",
+			"group-data-[collapsible=icon]:hidden",
+			className
+		),
+		"data-sidebar": "group-action",
+		...restProps,
+	});
+</script>
+
+{#if child}
+	{@render child({ props: propObj })}
+{:else}
+	<button bind:this={ref} {...propObj}>
+		{@render children?.()}
+	</button>
+{/if}
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-group-content.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-sidebar="group-content"
+	class={cn("w-full text-sm", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-group-label.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { Snippet } from "svelte";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		children,
+		child,
+		class: className,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLElement>> & {
+		child?: Snippet<[{ props: Record<string, unknown> }]>;
+	} = $props();
+
+	const mergedProps = $derived({
+		class: cn(
+			"text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-none transition-[margin,opa] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+			"group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
+			className
+		),
+		"data-sidebar": "group-label",
+		...restProps,
+	});
+</script>
+
+{#if child}
+	{@render child({ props: mergedProps })}
+{:else}
+	<div bind:this={ref} {...mergedProps}>
+		{@render children?.()}
+	</div>
+{/if}
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-group.svelte
+
+```svelte
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import type { WithElementRef } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-sidebar="group"
+	class={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-header.svelte
+
+```svelte
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import type { WithElementRef } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-sidebar="header"
+	class={cn("flex flex-col gap-2 p-2", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-input.svelte
+
+```svelte
+<script lang="ts">
+	import { Input } from "$lib/components/ui/input/index.js";
+	import { cn } from "$lib/utils.js";
+	import type { ComponentProps } from "svelte";
+
+	let {
+		ref = $bindable(null),
+		value = $bindable(""),
+		class: className,
+		...restProps
+	}: ComponentProps<typeof Input> = $props();
+</script>
+
+<Input
+	bind:ref
+	bind:value
+	data-sidebar="input"
+	class={cn(
+		"bg-background focus-visible:ring-sidebar-ring h-8 w-full shadow-none focus-visible:ring-2",
+		className
+	)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-inset.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLElement>> = $props();
+</script>
+
+<main
+	bind:this={ref}
+	class={cn(
+		"bg-background relative flex min-h-svh flex-1 flex-col",
+		"peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+</main>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-menu-action.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { Snippet } from "svelte";
+	import type { HTMLButtonAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		showOnHover = false,
+		children,
+		child,
+		...restProps
+	}: WithElementRef<HTMLButtonAttributes> & {
+		child?: Snippet<[{ props: Record<string, unknown> }]>;
+		showOnHover?: boolean;
+	} = $props();
+
+	const mergedProps = $derived({
+		class: cn(
+			"text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground peer-hover/menu-button:text-sidebar-accent-foreground absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-none transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+			// Increases the hit area of the button on mobile.
+			"after:absolute after:-inset-2 after:md:hidden",
+			"peer-data-[size=sm]/menu-button:top-1",
+			"peer-data-[size=default]/menu-button:top-1.5",
+			"peer-data-[size=lg]/menu-button:top-2.5",
+			"group-data-[collapsible=icon]:hidden",
+			showOnHover &&
+				"peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
+			className
+		),
+		"data-sidebar": "menu-action",
+		...restProps,
+	});
+</script>
+
+{#if child}
+	{@render child({ props: mergedProps })}
+{:else}
+	<button bind:this={ref} {...mergedProps}>
+		{@render children?.()}
+	</button>
+{/if}
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-menu-badge.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-sidebar="menu-badge"
+	class={cn(
+		"text-sidebar-foreground pointer-events-none absolute right-1 flex h-5 min-w-5 select-none items-center justify-center rounded-md px-1 text-xs font-medium tabular-nums",
+		"peer-hover/menu-button:text-sidebar-accent-foreground peer-data-[active=true]/menu-button:text-sidebar-accent-foreground",
+		"peer-data-[size=sm]/menu-button:top-1",
+		"peer-data-[size=default]/menu-button:top-1.5",
+		"peer-data-[size=lg]/menu-button:top-2.5",
+		"group-data-[collapsible=icon]:hidden",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-menu-button.svelte
+
+```svelte
+<script lang="ts" module>
+	import { tv, type VariantProps } from "tailwind-variants";
+
+	export const sidebarMenuButtonVariants = tv({
+		base: "peer/menu-button ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none transition-[width,height,padding] focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:font-medium group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+		variants: {
+			variant: {
+				default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+				outline:
+					"bg-background hover:bg-sidebar-accent hover:text-sidebar-accent-foreground shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
+			},
+			size: {
+				default: "h-8 text-sm",
+				sm: "h-7 text-xs",
+				lg: "h-12 text-sm group-data-[collapsible=icon]:!p-0",
+			},
+		},
+		defaultVariants: {
+			variant: "default",
+			size: "default",
+		},
+	});
+
+	export type SidebarMenuButtonVariant = VariantProps<
+		typeof sidebarMenuButtonVariants
+	>["variant"];
+	export type SidebarMenuButtonSize = VariantProps<typeof sidebarMenuButtonVariants>["size"];
+</script>
+
+<script lang="ts">
+	import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+	import { cn } from "$lib/utils.js";
+	import { mergeProps, type WithElementRef, type WithoutChildrenOrChild } from "bits-ui";
+	import type { ComponentProps, Snippet } from "svelte";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { useSidebar } from "./context.svelte.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		child,
+		variant = "default",
+		size = "default",
+		isActive = false,
+		tooltipContent,
+		tooltipContentProps,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
+		isActive?: boolean;
+		variant?: SidebarMenuButtonVariant;
+		size?: SidebarMenuButtonSize;
+		tooltipContent?: Snippet;
+		tooltipContentProps?: WithoutChildrenOrChild<ComponentProps<typeof Tooltip.Content>>;
+		child?: Snippet<[{ props: Record<string, unknown> }]>;
+	} = $props();
+
+	const sidebar = useSidebar();
+
+	const buttonProps = $derived({
+		class: cn(sidebarMenuButtonVariants({ variant, size }), className),
+		"data-sidebar": "menu-button",
+		"data-size": size,
+		"data-active": isActive,
+		...restProps,
+	});
+</script>
+
+{#snippet Button({ props }: { props?: Record<string, unknown> })}
+	{@const mergedProps = mergeProps(buttonProps, props)}
+	{#if child}
+		{@render child({ props: mergedProps })}
+	{:else}
+		<button bind:this={ref} {...mergedProps}>
+			{@render children?.()}
+		</button>
+	{/if}
+{/snippet}
+
+{#if !tooltipContent}
+	{@render Button({})}
+{:else}
+	<Tooltip.Root>
+		<Tooltip.Trigger>
+			{#snippet child({ props })}
+				{@render Button({ props })}
+			{/snippet}
+		</Tooltip.Trigger>
+		<Tooltip.Content
+			side="right"
+			align="center"
+			hidden={sidebar.state !== "collapsed" || sidebar.isMobile}
+			children={tooltipContent}
+			{...tooltipContentProps}
+		/>
+	</Tooltip.Root>
+{/if}
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-menu-item.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLLIElement>, HTMLLIElement> = $props();
+</script>
+
+<li
+	bind:this={ref}
+	data-sidebar="menu-item"
+	class={cn("group/menu-item relative", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</li>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-menu-skeleton.svelte
+
+```svelte
+<script lang="ts">
+	import { Skeleton } from "$lib/components/ui/skeleton/index.js";
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		showIcon = false,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLElement>> & {
+		showIcon?: boolean;
+	} = $props();
+
+	// Random width between 50% and 90%
+	const width = `${Math.floor(Math.random() * 40) + 50}%`;
+</script>
+
+<div
+	bind:this={ref}
+	data-sidebar="menu-skeleton"
+	class={cn("flex h-8 items-center gap-2 rounded-md px-2", className)}
+	{...restProps}
+>
+	{#if showIcon}
+		<Skeleton class="size-4 rounded-md" data-sidebar="menu-skeleton-icon" />
+	{/if}
+	<Skeleton
+		class="h-4 max-w-[--skeleton-width] flex-1"
+		data-sidebar="menu-skeleton-text"
+		style="--skeleton-width: {width};"
+	/>
+	{@render children?.()}
+</div>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-menu-sub-button.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { Snippet } from "svelte";
+	import type { HTMLAnchorAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		children,
+		child,
+		class: className,
+		size = "md",
+		isActive,
+		...restProps
+	}: WithElementRef<HTMLAnchorAttributes> & {
+		child?: Snippet<[{ props: Record<string, unknown> }]>;
+		size?: "sm" | "md";
+		isActive?: boolean;
+	} = $props();
+
+	const mergedProps = $derived({
+		class: cn(
+			"text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+			"data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
+			size === "sm" && "text-xs",
+			size === "md" && "text-sm",
+			"group-data-[collapsible=icon]:hidden",
+			className
+		),
+		"data-sidebar": "menu-sub-button",
+		"data-size": size,
+		"data-active": isActive,
+		...restProps,
+	});
+</script>
+
+{#if child}
+	{@render child({ props: mergedProps })}
+{:else}
+	<a bind:this={ref} {...mergedProps}>
+		{@render children?.()}
+	</a>
+{/if}
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-menu-sub-item.svelte
+
+```svelte
+<script lang="ts">
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLLIElement>> = $props();
+</script>
+
+<li bind:this={ref} data-sidebar="menu-sub-item" {...restProps}>
+	{@render children?.()}
+</li>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-menu-sub.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLUListElement>> = $props();
+</script>
+
+<ul
+	bind:this={ref}
+	data-sidebar="menu-sub"
+	class={cn(
+		"border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-0.5",
+		"group-data-[collapsible=icon]:hidden",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+</ul>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-menu.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLUListElement>, HTMLUListElement> = $props();
+</script>
+
+<ul
+	bind:this={ref}
+	data-sidebar="menu"
+	class={cn("flex w-full min-w-0 flex-col gap-1", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</ul>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-provider.svelte
+
+```svelte
+<script lang="ts">
+	import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+	import {
+		SIDEBAR_COOKIE_MAX_AGE,
+		SIDEBAR_COOKIE_NAME,
+		SIDEBAR_WIDTH,
+		SIDEBAR_WIDTH_ICON,
+	} from "./constants.js";
+	import { setSidebar } from "./context.svelte.js";
+
+	let {
+		ref = $bindable(null),
+		open = $bindable(true),
+		onOpenChange = () => {},
+		class: className,
+		style,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
+		open?: boolean;
+		onOpenChange?: (open: boolean) => void;
+	} = $props();
+
+	const sidebar = setSidebar({
+		open: () => open,
+		setOpen: (value: boolean) => {
+			open = value;
+			onOpenChange(value);
+
+			// This sets the cookie to keep the sidebar state.
+			document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+		},
+	});
+</script>
+
+<svelte:window onkeydown={sidebar.handleShortcutKeydown} />
+
+<Tooltip.Provider delayDuration={0}>
+	<div
+		style="--sidebar-width: {SIDEBAR_WIDTH}; --sidebar-width-icon: {SIDEBAR_WIDTH_ICON}; {style}"
+		class={cn(
+			"group/sidebar-wrapper has-[[data-variant=inset]]:bg-sidebar flex min-h-svh w-full",
+			className
+		)}
+		bind:this={ref}
+		{...restProps}
+	>
+		{@render children?.()}
+	</div>
+</Tooltip.Provider>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-rail.svelte
+
+```svelte
+<script lang="ts">
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { useSidebar } from "./context.svelte.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLButtonElement>, HTMLButtonElement> = $props();
+
+	const sidebar = useSidebar();
+</script>
+
+<button
+	bind:this={ref}
+	data-sidebar="rail"
+	aria-label="Toggle Sidebar"
+	tabIndex={-1}
+	onclick={() => sidebar.toggle()}
+	title="Toggle Sidebar"
+	class={cn(
+		"hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",
+		"[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize",
+		"[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
+		"group-data-[collapsible=offcanvas]:hover:bg-sidebar group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full",
+		"[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",
+		"[[data-side=right][data-collapsible=offcanvas]_&]:-left-2",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+</button>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-separator.svelte
+
+```svelte
+<script lang="ts">
+	import { Separator } from "$lib/components/ui/separator/index.js";
+	import { cn } from "$lib/utils.js";
+	import type { ComponentProps } from "svelte";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: ComponentProps<typeof Separator> = $props();
+</script>
+
+<Separator
+	bind:ref
+	data-sidebar="separator"
+	class={cn("bg-sidebar-border mx-2 w-auto", className)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar-trigger.svelte
+
+```svelte
+<script lang="ts">
+	import { Button } from "$lib/components/ui/button/index.js";
+	import { cn } from "$lib/utils.js";
+	import PanelLeft from "lucide-svelte/icons/panel-left";
+	import type { ComponentProps } from "svelte";
+	import { useSidebar } from "./context.svelte.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		onclick,
+		...restProps
+	}: ComponentProps<typeof Button> & {
+		onclick?: (e: MouseEvent) => void;
+	} = $props();
+
+	const sidebar = useSidebar();
+</script>
+
+<Button
+	type="button"
+	onclick={(e) => {
+		onclick?.(e);
+		sidebar.toggle();
+	}}
+	data-sidebar="trigger"
+	variant="ghost"
+	size="icon"
+	class={cn("h-7 w-7", className)}
+	{...restProps}
+>
+	<PanelLeft />
+	<span class="sr-only">Toggle Sidebar</span>
+</Button>
+
+```
+
+# sk/src/lib/components/ui/sidebar/sidebar.svelte
+
+```svelte
+<script lang="ts">
+	import * as Sheet from "$lib/components/ui/sheet/index.js";
+	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { SIDEBAR_WIDTH_MOBILE } from "./constants.js";
+	import { useSidebar } from "./context.svelte.js";
+
+	let {
+		ref = $bindable(null),
+		side = "left",
+		variant = "sidebar",
+		collapsible = "offcanvas",
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
+		side?: "left" | "right";
+		variant?: "sidebar" | "floating" | "inset";
+		collapsible?: "offcanvas" | "icon" | "none";
+	} = $props();
+
+	const sidebar = useSidebar();
+</script>
+
+{#if collapsible === "none"}
+	<div
+		class={cn(
+			"bg-sidebar text-sidebar-foreground flex h-full w-[--sidebar-width] flex-col",
+			className
+		)}
+		bind:this={ref}
+		{...restProps}
+	>
+		{@render children?.()}
+	</div>
+{:else if sidebar.isMobile}
+	<Sheet.Root
+		bind:open={() => sidebar.openMobile, (v) => sidebar.setOpenMobile(v)}
+		{...restProps}
+	>
+		<Sheet.Content
+			data-sidebar="sidebar"
+			data-mobile="true"
+			class="bg-sidebar text-sidebar-foreground w-[--sidebar-width] p-0 [&>button]:hidden"
+			style="--sidebar-width: {SIDEBAR_WIDTH_MOBILE};"
+			{side}
+		>
+			<div class="flex h-full w-full flex-col">
+				{@render children?.()}
+			</div>
+		</Sheet.Content>
+	</Sheet.Root>
+{:else}
+	<div
+		bind:this={ref}
+		class="text-sidebar-foreground group peer hidden md:block"
+		data-state={sidebar.state}
+		data-collapsible={sidebar.state === "collapsed" ? collapsible : ""}
+		data-variant={variant}
+		data-side={side}
+	>
+		<!-- This is what handles the sidebar gap on desktop -->
+		<div
+			class={cn(
+				"relative h-svh w-[--sidebar-width] bg-transparent transition-[width] duration-200 ease-linear",
+				"group-data-[collapsible=offcanvas]:w-0",
+				"group-data-[side=right]:rotate-180",
+				variant === "floating" || variant === "inset"
+					? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
+					: "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
+			)}
+		></div>
+		<div
+			class={cn(
+				"fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex",
+				side === "left"
+					? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
+					: "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
+				// Adjust the padding for floating and inset variants.
+				variant === "floating" || variant === "inset"
+					? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
+					: "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
+				className
+			)}
+			{...restProps}
+		>
+			<div
+				data-sidebar="sidebar"
+				class="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow"
+			>
+				{@render children?.()}
+			</div>
+		</div>
+	</div>
+{/if}
+
+```
+
+# sk/src/lib/components/ui/skeleton/index.ts
+
+```ts
+import Root from "./skeleton.svelte";
+
+export {
+	Root,
+	//
+	Root as Skeleton,
+};
+
+```
+
+# sk/src/lib/components/ui/skeleton/skeleton.svelte
+
+```svelte
+<script lang="ts">
+	import type { WithElementRef, WithoutChildren } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: WithoutChildren<WithElementRef<HTMLAttributes<HTMLDivElement>>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	class={cn("bg-primary/10 animate-pulse rounded-md", className)}
+	{...restProps}
+></div>
+
+```
+
+# sk/src/lib/components/ui/tooltip/index.ts
+
+```ts
+import { Tooltip as TooltipPrimitive } from "bits-ui";
+import Content from "./tooltip-content.svelte";
+
+const Root = TooltipPrimitive.Root;
+const Trigger = TooltipPrimitive.Trigger;
+const Provider = TooltipPrimitive.Provider;
+
+export {
+	Root,
+	Trigger,
+	Content,
+	Provider,
+	//
+	Root as Tooltip,
+	Content as TooltipContent,
+	Trigger as TooltipTrigger,
+	Provider as TooltipProvider,
+};
+
+```
+
+# sk/src/lib/components/ui/tooltip/tooltip-content.svelte
+
+```svelte
+<script lang="ts">
+	import { Tooltip as TooltipPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		sideOffset = 4,
+		...restProps
+	}: TooltipPrimitive.ContentProps = $props();
+</script>
+
+<TooltipPrimitive.Content
+	bind:ref
+	{sideOffset}
+	class={cn(
+		"bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 overflow-hidden rounded-md px-3 py-1.5 text-xs",
+		className
+	)}
+	{...restProps}
+/>
+
+```
+
+# sk/src/lib/hooks/is-mobile.svelte.ts
+
+```ts
+import { MediaQuery } from "svelte/reactivity";
+
+const MOBILE_BREAKPOINT = 768;
+
+export class IsMobile extends MediaQuery {
+	constructor() {
+		super(`max-width: ${MOBILE_BREAKPOINT - 1}px`);
+	}
+}
 
 ```
 
