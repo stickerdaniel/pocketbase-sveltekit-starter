@@ -48,7 +48,7 @@
         {
             "label": "Start Backend Dev Server",
             "type": "shell",
-            "command": "cd pb && ${HOME}/go/bin/modd",
+            "command": "cd sk && bun run dev:backend",
             "dependsOn": ["Install Go Tools"],
             "isBackground": true,
             "presentation": {
