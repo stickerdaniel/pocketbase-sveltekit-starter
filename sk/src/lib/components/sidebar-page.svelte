@@ -6,12 +6,29 @@
   import { base } from "$app/paths";
 
   let { title = "Dashboard", path = "Home", signupAllowed = true } = $props();
+
+  // Track scroll position for header shadow effect
+  let contentEl: HTMLDivElement;
+  let isScrolled = $state(false);
+
+  function handleScroll() {
+    isScrolled = contentEl?.scrollTop > 5;
+  }
 </script>
 
 <Sidebar.Provider>
   <AppSidebar {signupAllowed} />
   <Sidebar.Inset>
-    <header class="flex h-16 shrink-0 items-center gap-2">
+    <header
+      class="bg-background relative z-10 flex h-16 shrink-0 items-center gap-2 transition-all duration-200"
+    >
+      <!-- Bottom shadow that only appears when scrolled -->
+      <div
+        class="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-b from-transparent to-black/10 transition-opacity
+        duration-200"
+        class:opacity-0={!isScrolled}
+        class:opacity-100={isScrolled}
+      ></div>
       <div class="flex items-center gap-2 px-4">
         <Sidebar.Trigger class="-ml-1" />
         <Separator orientation="vertical" class="mr-2 h-4" />
@@ -28,7 +45,12 @@
         </Breadcrumb.Root>
       </div>
     </header>
-    <div class="flex flex-1 flex-col gap-4 overflow-auto p-4 pt-0">
+
+    <div
+      bind:this={contentEl}
+      on:scroll={handleScroll}
+      class="flex flex-1 flex-col gap-4 overflow-auto p-4 pt-0"
+    >
       <!-- Page content goes here -->
       <slot>
         <!-- Default content if no slot provided -->
