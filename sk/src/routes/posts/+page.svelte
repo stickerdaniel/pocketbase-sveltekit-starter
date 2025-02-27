@@ -7,7 +7,8 @@
   import EditPage from "./[slug]/edit/+page.svelte";
   import LoginGuard from "$lib/components/LoginGuard.svelte";
   import Paginator from "$lib/pocketbase/Paginator.svelte";
-  import Spinner, { activityStore } from "$lib/components/Spinner.svelte";
+  import { writable } from "svelte/store";
+  import { toast } from "svelte-sonner";
   import SidebarPage from "$lib/components/sidebar-page.svelte";
   import { Button } from "$lib/components/ui/button";
   import { AspectRatio } from "$lib/components/ui/aspect-ratio/index.js";
@@ -19,9 +20,22 @@
   $effect(() => {
     data.metadata.title = data.metadata.headline = "Posts";
   });
-  const store = activityStore(() =>
-    client.send("/api/generate", { method: "post" })
-  );
+  // Create a loading state store
+  const isGenerating = writable(false);
+  
+  // Function to generate a random post
+  async function generateRandomPost() {
+    try {
+      isGenerating.set(true);
+      await client.send("/api/generate", { method: "post" });
+      toast.success("Random post generated");
+    } catch (error) {
+      toast.error("Failed to generate random post");
+      console.error(error);
+    } finally {
+      isGenerating.set(false);
+    }
+  }
 </script>
 
 <SidebarPage title="Posts" path="Posts">
@@ -34,8 +48,15 @@
             <Button variant="default" {onclick}>New Post</Button>
           {/snippet}
         </Link2Modal>
-        <Button variant="outline" onclick={store.run} disabled={$store}>
-          <Spinner active={$store} />
+        <Button variant="outline" onclick={generateRandomPost} disabled={$isGenerating}>
+          {#if $isGenerating}
+            <span class="mr-2">
+              <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+          {/if}
           Generate Random Post
         </Button>
         {#snippet otherwise()}

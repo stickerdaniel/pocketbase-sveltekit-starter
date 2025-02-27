@@ -1,7 +1,7 @@
 <script lang="ts">
   import { toast } from "svelte-sonner";
   import FileInput from "$lib/components/FileInput.svelte";
-  import Spinner, { activityStore } from "$lib/components/Spinner.svelte";
+  import { writable } from "svelte/store";
   import { authModel, client, save } from "$lib/pocketbase";
   import FileField from "$lib/pocketbase/FileField.svelte";
   import type { PostsResponse } from "$lib/pocketbase/generated-types.js";
@@ -32,27 +32,39 @@
     body: z.string().trim().min(1, "required.").describe("Body"),
   });
 
+  // Create a loading state store
+  const isSaving = writable(false);
+
   async function onsubmit(e: SubmitEvent) {
     e.preventDefault();
-    const { success, error, data } = schema.safeParse(record);
-    if (success) {
-      const files = fileInput?.files;
-      const user = client.authStore.isAdmin ? "" : $authModel?.id;
-      record = await save<PostsResponse>("posts", {
-        ...data,
-        files,
-        user,
-        "files-": toBeRemoved,
-      });
-      toast.success("Post saved.");
-      history.back();
-    } else {
-      Object.entries(error.flatten().fieldErrors).forEach(([k, v]) =>
-        toast.error(`${k}: ${v}`)
-      );
+    
+    try {
+      isSaving.set(true);
+      const { success, error, data } = schema.safeParse(record);
+      
+      if (success) {
+        const files = fileInput?.files;
+        const user = client.authStore.isAdmin ? "" : $authModel?.id;
+        record = await save<PostsResponse>("posts", {
+          ...data,
+          files,
+          user,
+          "files-": toBeRemoved,
+        });
+        toast.success("Post saved.");
+        history.back();
+      } else {
+        Object.entries(error.flatten().fieldErrors).forEach(([k, v]) =>
+          toast.error(`${k}: ${v}`)
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to save post");
+      console.error(error);
+    } finally {
+      isSaving.set(false);
     }
   }
-  const store = activityStore<SubmitEvent>((e) => onsubmit(e));
 </script>
 
 <SidebarPage title="Edit Post" path="Edit Post">
@@ -61,7 +73,7 @@
       <CardTitle>{record.title ? `Edit: ${record.title}` : 'Create New Post'}</CardTitle>
     </CardHeader>
     <CardContent>
-      <form onsubmit={store.run} class="space-y-6">
+      <form onsubmit={onsubmit} class="space-y-6">
         <div class="text-sm text-muted-foreground">ID: {record.id ?? "-"}</div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -94,8 +106,15 @@
         </div>
         
         <div class="flex justify-end">
-          <Button type="submit">
-            <Spinner active={$store} />
+          <Button type="submit" disabled={$isSaving}>
+            {#if $isSaving}
+              <span class="mr-2">
+                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+            {/if}
             Save
           </Button>
         </div>
