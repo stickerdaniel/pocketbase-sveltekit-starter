@@ -155,8 +155,8 @@ export async function watch<T extends RecordModel>(
         .then((unsub) => (unsubRealtime = unsub));
   });
   async function setPage(newpage: number) {
-    const { page, totalPages, perPage } = result;
-    if (page > 0 && page <= totalPages) {
+    const { totalPages, perPage } = result;
+    if (newpage > 0 && newpage <= totalPages) {
       set((result = await collection.getList(newpage, perPage, queryParams)));
     }
   }
