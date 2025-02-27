@@ -10,7 +10,6 @@
   import Spinner, { activityStore } from "$lib/components/Spinner.svelte";
   import SidebarPage from "$lib/components/sidebar-page.svelte";
   import { Button } from "$lib/components/ui/button";
-  import { Card, CardContent } from "$lib/components/ui/card";
 
   const { data } = $props();
   const posts = $derived(data.posts);
@@ -45,46 +44,42 @@
     </div>
   </div>
 
-  <Card>
-    <CardContent class="p-4">
-      <Paginator store={posts} showIfSinglePage={true} />
-      <div class="space-y-4">
-        {#each $posts.items as item}
-          {@const [file] = item.files}
-          <a href={`${base}/posts/${item.slug || item.id}`} class="post block p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-            <div class="flex gap-4 items-start">
-              <div class="shrink-0">
-                <DateShow date={item.updated} />
-                <Image record={item} {file} />
-              </div>
-              <div class="flex-1">
-                <div class="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <span class="inline-flex items-center gap-1">
-                    <i class="bx bx-calendar" title="on date"></i>
-                    {new Intl.DateTimeFormat(undefined, { dateStyle: "full" }).format(
-                      new Date(item.updated)
-                    )}
-                  </span>
-                  {#if item.expand?.user?.name}
-                    <span class="inline-flex items-center gap-1">
-                      <i class="bx bx-pen" title="author"></i>
-                      {item.expand.user.name}
-                    </span>
-                  {/if}
-                </div>
-                <h2 class="text-lg font-semibold">{item.title}</h2>
-              </div>
-            </div>
-          </a>
-        {:else}
-          <div class="py-8 text-center text-muted-foreground">
-            No posts found. Create some new posts to get started.
+  <Paginator store={posts} showIfSinglePage={true} />
+  <div class="space-y-4 mt-4">
+    {#each $posts.items as item}
+      {@const [file] = item.files}
+      <a href={`${base}/posts/${item.slug || item.id}`} class="post block p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+        <div class="flex gap-4 items-start">
+          <div class="shrink-0">
+            <DateShow date={item.updated} />
+            <Image record={item} {file} />
           </div>
-        {/each}
+          <div class="flex-1">
+            <div class="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+              <span class="inline-flex items-center gap-1">
+                <i class="bx bx-calendar" title="on date"></i>
+                {new Intl.DateTimeFormat(undefined, { dateStyle: "full" }).format(
+                  new Date(item.updated)
+                )}
+              </span>
+              {#if item.expand?.user?.name}
+                <span class="inline-flex items-center gap-1">
+                  <i class="bx bx-pen" title="author"></i>
+                  {item.expand.user.name}
+                </span>
+              {/if}
+            </div>
+            <h2 class="text-lg font-semibold">{item.title}</h2>
+          </div>
+        </div>
+      </a>
+    {:else}
+      <div class="py-8 text-center text-muted-foreground">
+        No posts found. Create some new posts to get started.
       </div>
-      <Paginator store={posts} showIfSinglePage={true} />
-    </CardContent>
-  </Card>
+    {/each}
+  </div>
+  <Paginator store={posts} showIfSinglePage={true} />
 </SidebarPage>
 
 <style lang="scss">
