@@ -28,7 +28,7 @@
   }
 </script>
 
-<SidebarPage title="Audit Log" path="Audit Log">
+<SidebarPage title="Audit Log">
   <Card>
     <CardHeader>
       <CardTitle>Audit Log Records</CardTitle>

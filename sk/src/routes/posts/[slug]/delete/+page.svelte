@@ -11,7 +11,7 @@
   });
 </script>
 
-<SidebarPage title="Delete Post" path="Delete">
+<SidebarPage title="Delete Post">
   <Card>
     <CardHeader>
       <CardTitle>Delete Post: {record.title}</CardTitle>

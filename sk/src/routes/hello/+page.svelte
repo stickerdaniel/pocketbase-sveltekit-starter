@@ -16,7 +16,7 @@
   }
 </script>
 
-<SidebarPage title="Hello" path="Hello">
+<SidebarPage title="Hello">
   <div class="space-y-6">
     <Card>
       <CardHeader>

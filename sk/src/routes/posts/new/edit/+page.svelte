@@ -17,7 +17,7 @@
   let fileInput = $state() as HTMLInputElement;
   let toBeRemoved = $state([]);
   $effect(() => {
-    data.metadata.title = data.metadata.headline = `Edit Post: ${record.title}`;
+    data.metadata.title = data.metadata.headline = "Create New Post";
   });
 
   const schema = z.object({
@@ -74,10 +74,10 @@
   }
 </script>
 
-<SidebarPage title="Edit Post">
+<SidebarPage title="Create Post">
   <Card>
     <CardHeader>
-      <CardTitle>{record.title ? `Edit: ${record.title}` : 'Create New Post'}</CardTitle>
+      <CardTitle>Create New Post</CardTitle>
     </CardHeader>
     <CardContent>
       <form onsubmit={onsubmit} class="space-y-6">

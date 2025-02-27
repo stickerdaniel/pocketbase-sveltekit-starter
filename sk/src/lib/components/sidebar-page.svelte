@@ -4,8 +4,9 @@
   import { Separator } from "$lib/components/ui/separator/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import { base } from "$app/paths";
+  import { page } from "$app/stores";
 
-  let { title = "Dashboard", path = "Home", signupAllowed = true } = $props();
+  let { title = "Dashboard", signupAllowed = true } = $props();
 
   // Track scroll position for header shadow effect
   let contentEl: HTMLDivElement;
@@ -13,6 +14,63 @@
 
   function handleScroll() {
     isScrolled = contentEl?.scrollTop > 5;
+  }
+  
+  // Generate breadcrumbs from current URL
+  let breadcrumbs = $derived(generateBreadcrumbs($page.url.pathname));
+  
+  function generateBreadcrumbs(pathname: string): { href: string, label: string }[] {
+    // Remove base path if it exists
+    const path = pathname.startsWith(base) ? pathname.slice(base.length) : pathname;
+    
+    // Split the path into segments and filter out empty segments
+    const segments = path.split('/').filter(Boolean);
+    
+    // Always start with Home
+    const breadcrumbs: { href: string, label: string }[] = [
+      { href: `${base}/`, label: 'Home' }
+    ];
+    
+    // Build up the breadcrumbs based on path segments
+    let currentPath = base;
+    
+    for (let i = 0; i < segments.length; i++) {
+      // Add trailing slash if needed
+      if (!currentPath.endsWith('/')) {
+        currentPath += '/';
+      }
+      
+      // Add current segment to the path
+      currentPath += segments[i];
+      
+      // Decode URI component to handle URL encoded characters like %20
+      const decodedSegment = decodeURIComponent(segments[i]);
+      
+      // Custom label handling for specific paths
+      let label = '';
+      
+      // Special case handling for common route patterns
+      if (decodedSegment === 'new' && i === segments.length - 2 && segments[i+1] === 'edit') {
+        // Skip "new" segment when in new/edit path
+        continue;
+      } else if (decodedSegment === 'edit' && segments[i-1] === 'new') {
+        label = 'Create New Post';
+      } else if (decodedSegment === 'edit') {
+        label = 'Edit';
+      } else {
+        // Format the label: convert kebab-case or snake_case to Title Case
+        label = decodedSegment
+          .replace(/[-_]/g, ' ')
+          .replace(/\b\w/g, char => char.toUpperCase());
+      }
+      
+      breadcrumbs.push({
+        href: currentPath,
+        label: label
+      });
+    }
+    
+    return breadcrumbs;
   }
 </script>
 
@@ -34,12 +92,24 @@
         <Separator orientation="vertical" class="mr-2 h-4" />
         <Breadcrumb.Root>
           <Breadcrumb.List>
-            <Breadcrumb.Item class="hidden md:block">
-              <Breadcrumb.Link href={`${base}/`}>Home</Breadcrumb.Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Separator class="hidden md:block" />
-            <Breadcrumb.Item>
-              <Breadcrumb.Page>{path}</Breadcrumb.Page>
+            {#each breadcrumbs as crumb, i}
+              {#if i > 0}
+                <Breadcrumb.Separator class="hidden md:block" />
+              {/if}
+              <Breadcrumb.Item class="hidden md:block">
+                {#if i === breadcrumbs.length - 1}
+                  <Breadcrumb.Page>{crumb.label}</Breadcrumb.Page>
+                {:else}
+                  <Breadcrumb.Link href={crumb.href}>{crumb.label}</Breadcrumb.Link>
+                {/if}
+              </Breadcrumb.Item>
+            {/each}
+            
+            <!-- Mobile view shows only current page -->
+            <Breadcrumb.Item class="md:hidden">
+              <Breadcrumb.Page>
+                {breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].label : 'Home'}
+              </Breadcrumb.Page>
             </Breadcrumb.Item>
           </Breadcrumb.List>
         </Breadcrumb.Root>

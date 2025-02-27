@@ -32,7 +32,7 @@
   }
 </script>
 
-<SidebarPage title={record.title} path="Post">
+<SidebarPage title={record.title}>
   {#if $authModel}
     <div class="mb-4">
       <Button variant="outline" href={`${base}/posts/${record.slug || record.id}`}>

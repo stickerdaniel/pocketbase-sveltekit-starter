@@ -38,16 +38,14 @@
   }
 </script>
 
-<SidebarPage title="Posts" path="Posts">
+<SidebarPage title="Posts">
   <div class="mb-6 flex items-center justify-between">
     <h1 class="text-2xl font-bold">Blog Posts</h1>
     <div class="flex space-x-2">
       <LoginGuard>
-        <Link2Modal component={EditPage}>
-          {#snippet trigger(onclick)}
-            <Button variant="default" {onclick}>New Post</Button>
-          {/snippet}
-        </Link2Modal>
+        <Button variant="default" href={`${base}/posts/new/edit`}>
+          New Post
+        </Button>
         <Button variant="outline" onclick={generateRandomPost} disabled={$isGenerating}>
           {#if $isGenerating}
             <span class="mr-2">
