@@ -35,7 +35,7 @@ export const load: LayoutLoad = async ({ fetch }) => {
         toast.error(
           'Please visit <a href="/_/">/_</a> to finalize installation of PocketBase',
           {
-            descriptionClassName: "allow-links",
+            descriptionClass: "allow-links",
           }
         );
       }, 100);
