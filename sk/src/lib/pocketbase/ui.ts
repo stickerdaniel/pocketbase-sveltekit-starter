@@ -1,6 +1,8 @@
 import { toast } from "svelte-sonner";
 
-// wrapper to execute a pocketbase client request and generate toasts on failure
+// This function is being kept for backward compatibility
+// but ideally should be replaced with direct try/catch blocks 
+// using toast directly in the components that need it
 export async function alertOnFailure(request: () => void) {
   try {
     await request();

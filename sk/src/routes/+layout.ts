@@ -1,6 +1,6 @@
 import type { LayoutLoad } from "./$types";
 import { client } from "$lib/pocketbase";
-import { alerts } from "$lib/components/Alerts.svelte";
+import { toast } from "svelte-sonner";
 
 // turn off SSR - we're JAMstack here
 export const ssr = false;
@@ -30,17 +30,23 @@ export const load: LayoutLoad = async ({ fetch }) => {
   try {
     const response = await fetch(client.baseUrl + "/_/");
     if (response.redirected) {
-      alerts.add({
-        message:
+      // We need to wrap this in setTimeout to ensure it runs after Toaster is mounted
+      setTimeout(() => {
+        toast.error(
           'Please visit <a href="/_/">/_</a> to finalize installation of PocketBase',
-        type: "error",
-        html: true,
-      });
+          {
+            descriptionClassName: "allow-links",
+          }
+        );
+      }, 100);
     }
 
     config = await client.send("/api/config", { fetch, requestKey: "config" });
   } catch (e: any) {
-    alerts.error(e.toString());
+    // We need to wrap this in setTimeout to ensure it runs after Toaster is mounted
+    setTimeout(() => {
+      toast.error(e.toString());
+    }, 100);
   }
   return {
     config,

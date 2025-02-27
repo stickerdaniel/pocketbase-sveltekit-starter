@@ -1,8 +1,8 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { client } from "$lib/pocketbase";
-  import { alertOnFailure } from "$lib/pocketbase/ui";
   import { Button } from "$lib/components/ui/button";
+  import { toast } from "svelte-sonner";
 
   const {
     id,
@@ -18,10 +18,21 @@
   }
   async function submit(e: SubmitEvent) {
     e.preventDefault();
-    alertOnFailure(async () => {
+    try {
       await client.collection(table).delete(id);
+      toast.success("Record deleted successfully");
       await back();
-    });
+    } catch (e: any) {
+      const message = e.message || "Error deleting record";
+      toast.error(message);
+      
+      // Handle data errors if available
+      const { data = {} } = e.response?.data || {};
+      for (const key in data) {
+        const message = data[key]?.message;
+        if (message) toast.error(`${key}: ${message}`);
+      }
+    }
   }
 </script>
 
