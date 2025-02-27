@@ -1,5 +1,6 @@
 <script lang="ts">
   import { client } from "$lib/pocketbase/index.js";
+  import { Button } from "$lib/components/ui/button";
 
   let { data } = $props();
   $effect(() => {
@@ -18,5 +19,5 @@
 <pre>{JSON.stringify(data, null, 2)}</pre>
 
 <form method="post" onsubmit={sendEmail}>
-  <button type="submit">Send me an email</button>
+  <Button type="submit">Send me an email</Button>
 </form>
