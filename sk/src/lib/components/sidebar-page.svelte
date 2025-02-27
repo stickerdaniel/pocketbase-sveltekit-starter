@@ -5,11 +5,7 @@
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import { base } from "$app/paths";
 
-  let { 
-    title = "Dashboard", 
-    path = "Home",
-    signupAllowed = true 
-  } = $props();
+  let { title = "Dashboard", path = "Home", signupAllowed = true } = $props();
 </script>
 
 <Sidebar.Provider>
@@ -32,7 +28,7 @@
         </Breadcrumb.Root>
       </div>
     </header>
-    <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+    <div class="flex flex-1 flex-col gap-4 overflow-auto p-4 pt-0">
       <!-- Page content goes here -->
       <slot>
         <!-- Default content if no slot provided -->
