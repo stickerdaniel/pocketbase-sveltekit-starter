@@ -10,6 +10,9 @@
   import Spinner, { activityStore } from "$lib/components/Spinner.svelte";
   import SidebarPage from "$lib/components/sidebar-page.svelte";
   import { Button } from "$lib/components/ui/button";
+  import { AspectRatio } from "$lib/components/ui/aspect-ratio/index.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import { Calendar, User } from "lucide-svelte";
 
   const { data } = $props();
   const posts = $derived(data.posts);
@@ -22,15 +25,13 @@
 </script>
 
 <SidebarPage title="Posts" path="Posts">
-  <div class="flex justify-between items-center mb-6">
+  <div class="mb-6 flex items-center justify-between">
     <h1 class="text-2xl font-bold">Blog Posts</h1>
     <div class="flex space-x-2">
       <LoginGuard>
         <Link2Modal component={EditPage}>
           {#snippet trigger(onclick)}
-            <Button variant="default" {onclick}>
-              New Post
-            </Button>
+            <Button variant="default" {onclick}>New Post</Button>
           {/snippet}
         </Link2Modal>
         <Button variant="outline" onclick={store.run} disabled={$store}>
@@ -38,58 +39,53 @@
           Generate Random Post
         </Button>
         {#snippet otherwise()}
-          <p class="text-sm text-muted-foreground">Please Sign In to create/edit posts.</p>
+          <p class="text-muted-foreground text-sm">
+            Please Sign In to create/edit posts.
+          </p>
         {/snippet}
       </LoginGuard>
     </div>
   </div>
 
-  <Paginator store={posts} showIfSinglePage={true} />
-  <div class="space-y-4 mt-4">
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
     {#each $posts.items as item}
       {@const [file] = item.files}
-      <a href={`${base}/posts/${item.slug || item.id}`} class="post block p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-        <div class="flex gap-4 items-start">
-          <div class="shrink-0">
-            <DateShow date={item.updated} />
-            <Image record={item} {file} />
+      <a href={`${base}/posts/${item.slug || item.id}`} class="group block">
+        <Card.Root
+          class="h-full overflow-hidden transition-all hover:shadow-md"
+        >
+          <div class="relative">
+            <AspectRatio ratio={16 / 9} class="bg-muted/30">
+              <Image record={item} {file} class="h-full w-full object-cover" />
+            </AspectRatio>
           </div>
-          <div class="flex-1">
-            <div class="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-              <span class="inline-flex items-center gap-1">
-                <i class="bx bx-calendar" title="on date"></i>
-                {new Intl.DateTimeFormat(undefined, { dateStyle: "full" }).format(
-                  new Date(item.updated)
-                )}
+          <Card.Content class="p-4">
+            <h2
+              class="group-hover:text-primary mb-2 line-clamp-2 text-xl font-semibold transition-colors"
+            >
+              {item.title}
+            </h2>
+            <div class="text-muted-foreground flex items-center gap-3 text-sm">
+              <span class="inline-flex items-center gap-1.5">
+                <Calendar size={14} />
+                <span>{new Date(item.updated).toLocaleDateString()}</span>
               </span>
               {#if item.expand?.user?.name}
-                <span class="inline-flex items-center gap-1">
-                  <i class="bx bx-pen" title="author"></i>
-                  {item.expand.user.name}
+                <span class="inline-flex items-center gap-1.5">
+                  <User size={14} />
+                  <span>{item.expand.user.name}</span>
                 </span>
               {/if}
             </div>
-            <h2 class="text-lg font-semibold">{item.title}</h2>
-          </div>
-        </div>
+          </Card.Content>
+        </Card.Root>
       </a>
     {:else}
-      <div class="py-8 text-center text-muted-foreground">
-        No posts found. Create some new posts to get started.
+      <div class="col-span-full py-12 text-center text-muted-foreground">
+        <p class="text-lg">No posts found.</p>
+        <p class="mt-2">Create some new posts to get started.</p>
       </div>
     {/each}
   </div>
-  <Paginator store={posts} showIfSinglePage={true} />
+  <Paginator store={posts} showIfSinglePage={true} class="mt-6" />
 </SidebarPage>
-
-<style lang="scss">
-  .post {
-    color: inherit;
-    display: flex;
-    gap: 1rem;
-    padding-block: 1rem;
-    & + .post {
-      border-block-start: dashed 1px;
-    }
-  }
-</style>
