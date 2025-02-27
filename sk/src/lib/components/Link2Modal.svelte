@@ -2,7 +2,6 @@
   import { invalidateAll, preloadData, pushState } from "$app/navigation";
   import { page } from "$app/stores";
   import type { ComponentType, Snippet, SvelteComponent } from "svelte";
-  import Alerts from "./Alerts.svelte";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
 
   const {
@@ -48,7 +47,6 @@
         <Dialog.Title>{$page.state.selected.metadata.headline}</Dialog.Title>
         <Dialog.Close />
       </Dialog.Header>
-      <Alerts />
       <svelte:component this={component} data={$page.state.selected} />
     </Dialog.Content>
   </Dialog.Root>

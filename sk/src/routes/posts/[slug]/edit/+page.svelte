@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { alerts } from "$lib/components/Alerts.svelte";
+  import { toast } from "svelte-sonner";
   import FileInput from "$lib/components/FileInput.svelte";
   import Spinner, { activityStore } from "$lib/components/Spinner.svelte";
   import { authModel, client, save } from "$lib/pocketbase";
@@ -42,11 +42,11 @@
         user,
         "files-": toBeRemoved,
       });
-      alerts.info("Post saved.", 5000);
+      toast.success("Post saved.");
       history.back();
     } else {
       Object.entries(error.flatten().fieldErrors).forEach(([k, v]) =>
-        alerts.error(`${k}: ${v}`)
+        toast.error(`${k}: ${v}`)
       );
     }
   }

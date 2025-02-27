@@ -9,7 +9,7 @@
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import { Checkbox } from "$lib/components/ui/checkbox";
-  import Alerts, { alerts } from "./Alerts.svelte";
+  import { toast } from "svelte-sonner";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
 
   const coll = client.collection(authCollection);
@@ -25,14 +25,18 @@
 
   async function submit(e: SubmitEvent) {
     e.preventDefault();
-    if (!isLogin) {
-      await coll.create({ ...form });
-    }
-    // signin
-    if (form.admin) {
-      await client.admins.authWithPassword(form.email, form.password);
-    } else {
-      await coll.authWithPassword(form.email, form.password);
+    try {
+      if (!isLogin) {
+        await coll.create({ ...form });
+      }
+      // signin
+      if (form.admin) {
+        await client.admins.authWithPassword(form.email, form.password);
+      } else {
+        await coll.authWithPassword(form.email, form.password);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Authentication failed");
     }
   }
 </script>
@@ -46,7 +50,6 @@
       : "Create a new account"}
   </Dialog.Description>
 </Dialog.Header>
-<Alerts />
 
 <form onsubmit={submit} class="grid gap-4">
   {#if passwordLogin}

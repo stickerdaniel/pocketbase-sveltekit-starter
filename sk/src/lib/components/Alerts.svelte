@@ -1,4 +1,9 @@
 <script lang="ts" context="module">
+  import { toast } from "svelte-sonner";
+
+  // This file provides a compatibility layer for the old alerts API
+  // while using the new Sonner toast system underneath
+
   interface Alert {
     message: string;
     type: string;
@@ -6,47 +11,49 @@
     html?: boolean;
   }
 
-  let _alerts = $state<Alert[]>([]);
   export const alerts = {
     add({ message, type = "info", timeout = 0, html = false }: Alert) {
-      const alert = { message, type, html };
-      _alerts = _alerts.concat(alert);
-      if (timeout) {
-        setTimeout(() => {
-          dismiss(alert);
-        }, timeout);
+      switch (type) {
+        case "success":
+          toast.success(message);
+          break;
+        case "error":
+          toast.error(message);
+          break;
+        case "warning":
+          toast.warning(message);
+          break;
+        case "info":
+        default:
+          toast.info(message);
+          break;
       }
     },
     info(message: string, timeout = 0) {
-      this.add({ message, type: "info", timeout });
+      toast.info(message);
     },
     success(message: string, timeout = 0) {
-      this.add({ message, type: "success", timeout });
+      toast.success(message);
     },
     warning(message: string, timeout = 0) {
-      this.add({ message, type: "warning", timeout });
+      toast.warning(message);
     },
     error(message: string, timeout = 0) {
-      this.add({ message, type: "error", timeout });
+      toast.error(message);
     },
   };
 
   export function errorAlert(message: string) {
-    const type = "error";
+    toast.error(message);
   }
 
-  function dismiss(alert: Alert) {
-    _alerts = _alerts.filter((a) => a !== alert);
-  }
-
-  function dismissAll() {
-    _alerts = [];
-  }
   function onunhandledrejection(e: PromiseRejectionEvent) {
-    alerts.error(e.reason.toString());
+    toast.error(e.reason.toString());
     const { data = {} } = e.reason.response ?? {};
     for (const [key, value] of Object.entries(data)) {
-      alerts.error(`${key}: ${value?.message}`);
+      if (value?.message) {
+        toast.error(`${key}: ${value.message}`);
+      }
     }
   }
 </script>
@@ -54,41 +61,4 @@
 <!-- to display alerts for unhandled promise rejections -->
 <svelte:window {onunhandledrejection} />
 
-<article>
-  {#if _alerts.length > 1}
-    <button onclick={dismissAll} class="dismiss">&times; dismiss all</button>
-  {/if}
-  {#each _alerts as alert}
-    <blockquote class={alert.type}>
-      <button onclick={() => dismiss(alert)} class="dismiss">&times;</button>
-      {#if alert.html}
-        {@html alert.message}
-      {:else}
-        {alert.message}
-      {/if}
-    </blockquote>
-  {/each}
-</article>
-
-<style>
-  .dismiss {
-    cursor: pointer;
-    padding: 2px 7px;
-    border-radius: 15px;
-  }
-  blockquote {
-    margin: 0 0;
-  }
-  .success {
-    color: var(--links);
-    border-left-color: var(--links);
-  }
-  .warning {
-    color: var(--variable);
-    border-left-color: var(--selection);
-  }
-  .error {
-    color: var(--danger);
-    border-left-color: var(--variable);
-  }
-</style>
+<!-- This component now does nothing visually since Toaster is in the layout -->

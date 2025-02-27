@@ -3,7 +3,8 @@
   import "../app.scss";
   import { base } from "$app/paths";
   import { page } from "$app/stores";
-  import Alerts from "$lib/components/Alerts.svelte";
+  import { Toaster } from "$lib/components/ui/sonner";
+  import { toast } from "svelte-sonner";
   import LoginBadge from "$lib/components/LoginBadge.svelte";
   import Nav from "$lib/components/Nav.svelte";
   const { data, children } = $props();
@@ -13,6 +14,7 @@
   $effect(() => {
     if ($page.error) {
       metadata.title = $page.error.message;
+      toast.error($page.error.message);
     }
   });
 </script>
@@ -20,6 +22,8 @@
 <svelte:head>
   <title>{metadata.title} | {config.site?.name}</title>
 </svelte:head>
+
+<Toaster />
 
 <header class="container">
   <a href={`${base}/`} class="logo">
@@ -29,7 +33,6 @@
   <LoginBadge signupAllowed={config.signupAllowed} />
 </header>
 <main class="container">
-  <Alerts />
   <h1>{metadata.headline ?? metadata.title}</h1>
   {@render children()}
 </main>

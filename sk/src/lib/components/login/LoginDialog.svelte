@@ -1,7 +1,6 @@
 <script lang="ts">
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   import LoginForm from "$lib/components/LoginForm.svelte";
-  import Alerts from "$lib/components/Alerts.svelte";
   
   const { signupAllowed = true } = $props();
 </script>
@@ -17,7 +16,6 @@
         Enter your credentials to access your account.
       </Dialog.Description>
     </Dialog.Header>
-    <Alerts />
     <LoginForm {signupAllowed} />
     <Dialog.Footer>
       <Dialog.Close>Cancel</Dialog.Close>

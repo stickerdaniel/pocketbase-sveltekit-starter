@@ -1,6 +1,6 @@
-import { alerts } from "$lib/components/Alerts.svelte";
+import { toast } from "svelte-sonner";
 
-// wrapper to execute a pocketbase client request and generate alerts on failure
+// wrapper to execute a pocketbase client request and generate toasts on failure
 export async function alertOnFailure(request: () => void) {
   try {
     await request();
@@ -9,10 +9,10 @@ export async function alertOnFailure(request: () => void) {
       message,
       data: { data = {} },
     } = e;
-    if (message) alerts.error(message);
+    if (message) toast.error(message);
     for (const key in data) {
       const { message } = data[key];
-      if (message) alerts.error(`${key}: ${message}`);
+      if (message) toast.error(`${key}: ${message}`);
     }
   }
 }

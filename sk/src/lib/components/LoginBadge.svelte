@@ -4,7 +4,7 @@
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   import { Button } from "$lib/components/ui/button";
   import LoginForm from "./LoginForm.svelte";
-  import Alerts, { alerts } from "./Alerts.svelte";
+  import { toast } from "svelte-sonner";
   const { signupAllowed = true } = $props();
   async function logout() {
     client.authStore.clear();
@@ -12,9 +12,9 @@
   const unsubscribe = client.authStore.onChange((token, model) => {
     if (model) {
       const { name, username } = model;
-      alerts.success(`Signed in as ${name || username || "Admin"}`, 5000);
+      toast.success(`Signed in as ${name || username || "Admin"}`);
     } else {
-      alerts.success(`Signed out`, 5000);
+      toast.success(`Signed out`);
     }
   }, false);
   onDestroy(() => {
