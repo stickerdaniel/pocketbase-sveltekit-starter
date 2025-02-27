@@ -8,6 +8,7 @@
   import TabGroup from "./TabGroup.svelte";
   import Tab from "./Tab.svelte";
   import TabContent from "./TabContent.svelte";
+  import { Button } from "$lib/components/ui/button";
   const coll = client.collection(authCollection);
 
   const form = $state({
@@ -45,7 +46,7 @@
   <label title="sign-in as admin">
     <input type="checkbox" bind:checked={form.admin} />Admin
   </label>
-  <button type="submit" onclick={() => (signup = false)}>Sign In</button>
+  <Button type="submit" onclick={() => (signup = false)}>Sign In</Button>
 {/snippet}
 
 <form onsubmit={submit}>
@@ -85,7 +86,7 @@
             placeholder="name / label"
           />
           <input type="hidden" name="register" value={true} />
-          <button type="submit" onclick={() => (signup = true)}>Sign Up</button>
+          <Button type="submit" onclick={() => (signup = true)}>Sign Up</Button>
         </TabContent>
       </TabGroup>
     {:else}
@@ -95,8 +96,8 @@
   {/if}
   {#await coll.listAuthMethods({ $autoCancel: false }) then methods}
     {#each methods.authProviders as p}
-      <button type="button" onclick={() => providerLogin(p, coll)}
-        >Sign-in with {p.name}</button
+      <Button type="button" variant="outline" onclick={() => providerLogin(p, coll)}
+        >Sign-in with {p.name}</Button
       >
     {/each}
   {:catch}

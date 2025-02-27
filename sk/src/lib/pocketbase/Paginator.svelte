@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import type { PageStore } from ".";
+  import { Button } from "$lib/components/ui/button";
 
   const {
     store,
@@ -13,16 +14,18 @@
 
 {#if showIfSinglePage || $store.totalPages > 1}
   <div class="paginator">
-    <button
-      type="button"
+    <Button
+      variant="outline"
+      size="sm"
       onclick={() => store.prev()}
-      disabled={$store.page <= 1}>&laquo;</button
+      disabled={$store.page <= 1}>&laquo;</Button
     >
     <div>page {$store.page} of {$store.totalPages}</div>
-    <button
-      type="button"
+    <Button
+      variant="outline"
+      size="sm"
       onclick={() => store.next()}
-      disabled={$store.page >= $store.totalPages}>&raquo;</button
+      disabled={$store.page >= $store.totalPages}>&raquo;</Button
     >
   </div>
 {/if}

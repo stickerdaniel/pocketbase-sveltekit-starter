@@ -1,5 +1,6 @@
 <script lang="ts">
   import { client } from ".";
+  import { Button } from "$lib/components/ui/button";
 
   let {
     record,
@@ -30,9 +31,9 @@
           </a>
         </td>
         <td>
-          <button type="button" class="small round" {onclick} {title}>
+          <Button variant="ghost" size="icon" {onclick} {title}>
             <i class="bx bx-{icon}"></i>
-          </button>
+          </Button>
         </td>
       </tr>
     {:else}

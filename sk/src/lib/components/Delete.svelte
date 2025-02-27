@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { client } from "$lib/pocketbase";
   import { alertOnFailure } from "$lib/pocketbase/ui";
+  import { Button } from "$lib/components/ui/button";
 
   const {
     id,
@@ -28,6 +29,6 @@
   <article>
     <aside>Are you sure you want to delete the following record?</aside>
   </article>
-  <button type="submit">Yes - Proceed</button>
-  <button type="reset" onclick={back}>No - Cancel</button>
+  <Button type="submit" variant="destructive">Yes - Proceed</Button>
+  <Button type="reset" variant="outline" onclick={back}>No - Cancel</Button>
 </form>

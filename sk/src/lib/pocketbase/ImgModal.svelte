@@ -2,6 +2,7 @@
   import type { BaseModel } from "pocketbase";
   import { client } from ".";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
+  import { Button } from "$lib/components/ui/button";
 
   const {
     record,
@@ -18,9 +19,9 @@
   {@const thumbSrc = client.getFileUrl(record, filename, { thumb: "100x100" })}
   <Dialog.Root>
     <Dialog.Trigger>
-      <button type="button" class="thumbnail">
+      <Button variant="ghost" class="thumbnail p-0">
         <img src={thumbSrc} alt="image preview" />
-      </button>
+      </Button>
     </Dialog.Trigger>
     <Dialog.Content>
       {#if !thumbOnly}

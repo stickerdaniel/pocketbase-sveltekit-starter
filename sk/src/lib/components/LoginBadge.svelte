@@ -3,6 +3,7 @@
   import { authModel, client } from "../pocketbase";
   import Alerts, { alerts } from "./Alerts.svelte";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
+  import { Button } from "$lib/components/ui/button";
   import LoginForm from "./LoginForm.svelte";
   const { signupAllowed = true } = $props();
   async function logout() {
@@ -24,7 +25,7 @@
 {#if $authModel}
   <Dialog.Root>
     <Dialog.Trigger>
-      <button class="badge">
+      <Button variant="ghost" class="badge">
         {#if $authModel.avatar}
           <img
             src={client.getFileUrl($authModel, $authModel.avatar)}
@@ -34,7 +35,7 @@
         <samp
           >{$authModel?.name || $authModel?.username || $authModel?.email}</samp
         >
-      </button>
+      </Button>
     </Dialog.Trigger>
     <Dialog.Content>
       <Dialog.Header>
@@ -53,7 +54,7 @@
           >
         </div>
         <Dialog.Footer>
-          <button onclick={logout}>Sign Out</button>
+          <Button variant="destructive" onclick={logout}>Sign Out</Button>
         </Dialog.Footer>
       </div>
     </Dialog.Content>
@@ -61,9 +62,9 @@
 {:else}
   <Dialog.Root>
     <Dialog.Trigger>
-      <button>
+      <Button>
         {signupAllowed ? "Sign In / Sign Up" : "Sign In"}
-      </button>
+      </Button>
     </Dialog.Trigger>
     <Dialog.Content>
       <Dialog.Header>
