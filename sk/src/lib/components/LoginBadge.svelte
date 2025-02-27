@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { authModel, client } from "../pocketbase";
-  import Alerts, { alerts } from "./Alerts.svelte";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   import { Button } from "$lib/components/ui/button";
   import LoginForm from "./LoginForm.svelte";
+  import Alerts, { alerts } from "./Alerts.svelte";
   const { signupAllowed = true } = $props();
   async function logout() {
     client.authStore.clear();
@@ -37,7 +37,7 @@
         >
       </Button>
     </Dialog.Trigger>
-    <Dialog.Content>
+    <Dialog.Content class="max-w-sm">
       <Dialog.Header>
         <Dialog.Title>Profile</Dialog.Title>
       </Dialog.Header>
@@ -50,7 +50,9 @@
             />
           {/if}
           <samp
-            >{$authModel?.name ?? $authModel?.username ?? $authModel?.email}</samp
+            >{$authModel?.name ??
+              $authModel?.username ??
+              $authModel?.email}</samp
           >
         </div>
         <Dialog.Footer>
@@ -66,11 +68,7 @@
         {signupAllowed ? "Sign In / Sign Up" : "Sign In"}
       </Button>
     </Dialog.Trigger>
-    <Dialog.Content>
-      <Dialog.Header>
-        <Dialog.Title>{signupAllowed ? "Sign In / Sign Up" : "Sign In"}</Dialog.Title>
-      </Dialog.Header>
-      <Alerts />
+    <Dialog.Content class="max-w-sm">
       <LoginForm {signupAllowed} />
     </Dialog.Content>
   </Dialog.Root>
