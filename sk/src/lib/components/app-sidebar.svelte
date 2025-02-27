@@ -1,13 +1,16 @@
 <script lang="ts" module>
-	import BookOpen from "lucide-svelte/icons/book-open";
+	import Home from "lucide-svelte/icons/home";
+	import FileText from "lucide-svelte/icons/file-text";
 	import Bot from "lucide-svelte/icons/bot";
-	import ChartPie from "lucide-svelte/icons/chart-pie";
-	import Frame from "lucide-svelte/icons/frame";
-	import LifeBuoy from "lucide-svelte/icons/life-buoy";
-	import Map from "lucide-svelte/icons/map";
-	import Send from "lucide-svelte/icons/send";
 	import Settings2 from "lucide-svelte/icons/settings-2";
-	import SquareTerminal from "lucide-svelte/icons/square-terminal";
+	import BookOpen from "lucide-svelte/icons/book-open";
+	import LifeBuoy from "lucide-svelte/icons/life-buoy";
+	import Send from "lucide-svelte/icons/send";
+	import Frame from "lucide-svelte/icons/frame";
+	import ChartPie from "lucide-svelte/icons/chart-pie";
+	import Map from "lucide-svelte/icons/map";
+	import Database from "lucide-svelte/icons/database";
+	import { base } from "$app/paths";
 
 	const data = {
 		user: {
@@ -17,43 +20,41 @@
 		},
 		navMain: [
 			{
-				title: "Playground",
-				url: "#",
-				icon: SquareTerminal,
+				title: "Home",
+				url: `${base}/`,
+				icon: Home,
 				isActive: true,
+			},
+			{
+				title: "Posts",
+				url: `${base}/posts`,
+				icon: FileText,
 				items: [
 					{
-						title: "History",
-						url: "#",
+						title: "All Posts",
+						url: `${base}/posts`,
 					},
 					{
-						title: "Starred",
-						url: "#",
-					},
-					{
-						title: "Settings",
-						url: "#",
-					},
+						title: "Create Post",
+						url: `${base}/posts/new/edit`,
+					}
 				],
 			},
 			{
-				title: "Models",
-				url: "#",
+				title: "Hello",
+				url: `${base}/hello`,
 				icon: Bot,
+			},
+			{
+				title: "Admin",
+				url: "#",
+				icon: Database,
 				items: [
 					{
-						title: "Genesis",
-						url: "#",
+						title: "Audit Log",
+						url: `${base}/auditlog/users/1`,
 					},
-					{
-						title: "Explorer",
-						url: "#",
-					},
-					{
-						title: "Quantum",
-						url: "#",
-					},
-				],
+				]
 			},
 			{
 				title: "Documentation",
@@ -143,7 +144,11 @@
 	import Command from "lucide-svelte/icons/command";
 	import type { ComponentProps } from "svelte";
 
-	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
+	let { 
+		ref = $bindable(null), 
+		signupAllowed = true,
+		...restProps 
+	}: ComponentProps<typeof Sidebar.Root> & { signupAllowed?: boolean } = $props();
 </script>
 
 <Sidebar.Root bind:ref variant="inset" {...restProps}>
@@ -152,15 +157,15 @@
 			<Sidebar.MenuItem>
 				<Sidebar.MenuButton size="lg">
 					{#snippet child({ props })}
-						<a href="##" {...props}>
+						<a href={`${base}/`} {...props}>
 							<div
 								class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
 							>
 								<Command class="size-4" />
 							</div>
 							<div class="grid flex-1 text-left text-sm leading-tight">
-								<span class="truncate font-semibold">Acme Inc</span>
-								<span class="truncate text-xs">Enterprise</span>
+								<span class="truncate font-semibold">PocketBase SK</span>
+								<span class="truncate text-xs">Starter Kit</span>
 							</div>
 						</a>
 					{/snippet}
@@ -174,6 +179,6 @@
 		<NavSecondary items={data.navSecondary} class="mt-auto" />
 	</Sidebar.Content>
 	<Sidebar.Footer>
-		<NavUser user={data.user} />
+		<NavUser {signupAllowed} />
 	</Sidebar.Footer>
 </Sidebar.Root>

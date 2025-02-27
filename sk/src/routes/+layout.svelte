@@ -1,12 +1,10 @@
 <script lang="ts">
   import "../app.css";
   import "../app.scss";
-  import { base } from "$app/paths";
   import { page } from "$app/stores";
   import { Toaster } from "$lib/components/ui/sonner";
   import { toast } from "svelte-sonner";
-  import LoginBadge from "$lib/components/LoginBadge.svelte";
-  import Nav from "$lib/components/Nav.svelte";
+  
   const { data, children } = $props();
   const metadata = $derived(data.metadata ?? {});
   const config = $derived(data.config ?? {});
@@ -25,33 +23,16 @@
 
 <Toaster />
 
-<header class="container">
-  <a href={`${base}/`} class="logo">
-    <img src={`${base}/favicon.svg`} alt="application logo" />
-  </a>
-  <Nav />
-  <LoginBadge signupAllowed={config.signupAllowed} />
-</header>
-<main class="container">
-  <h1>{metadata.headline ?? metadata.title}</h1>
-  {@render children()}
-</main>
-<footer class="container">
-  Copyright &copy; {config.site?.year}
-  {config.site?.copyright}
-</footer>
+{@render children()}
 
 <style lang="scss">
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    .logo {
-      width: 2rem;
-      height: 2rem;
-    }
+  :global(html, body) {
+    height: 100%;
   }
-  main {
-    flex-grow: 1;
+  
+  :global(body) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
 </style>
