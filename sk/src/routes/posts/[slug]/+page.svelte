@@ -11,6 +11,7 @@
   import Trash from "lucide-svelte/icons/trash";
   import FileText from "lucide-svelte/icons/file-text";
   import ClipboardList from "lucide-svelte/icons/clipboard-list";
+  import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
 
   const { data } = $props();
   const record = $derived(data.record);
@@ -20,15 +21,13 @@
 
   // Action handlers
   async function handleDelete() {
-    if (confirm(`Are you sure you want to delete "${record.title}"?`)) {
-      try {
-        await client.collection('posts').delete(record.id);
-        toast.success("Post deleted successfully");
-        goto(`${base}/posts`);
-      } catch (error) {
-        toast.error("Failed to delete post");
-        console.error(error);
-      }
+    try {
+      await client.collection('posts').delete(record.id);
+      toast.success("Post deleted successfully");
+      goto(`${base}/posts`);
+    } catch (error) {
+      toast.error("Failed to delete post");
+      console.error(error);
     }
   }
 </script>
@@ -44,10 +43,36 @@
         <Edit class="mr-2 h-4 w-4" />
         Edit
       </Button>
-      <Button variant="outline" onclick={handleDelete}>
-        <Trash class="mr-2 h-4 w-4" />
-        Delete
-      </Button>
+      <AlertDialog.Root>
+        <AlertDialog.Trigger asChild>
+          <div>
+            <Button variant="outline">
+              <Trash class="mr-2 h-4 w-4" />
+              Delete
+            </Button>
+          </div>
+        </AlertDialog.Trigger>
+        <AlertDialog.Content>
+          <AlertDialog.Header>
+            <AlertDialog.Title>Delete Post</AlertDialog.Title>
+            <AlertDialog.Description>
+              Are you sure you want to delete "{record.title}"? This action cannot be undone.
+            </AlertDialog.Description>
+          </AlertDialog.Header>
+          <AlertDialog.Footer>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <div>
+              <Button 
+                variant="destructive" 
+                onclick={handleDelete}
+                class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Delete
+              </Button>
+            </div>
+          </AlertDialog.Footer>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
       <Button variant="outline" href={`${base}/auditlog/posts/${record.id}`}>
         <ClipboardList class="mr-2 h-4 w-4" />
         Audit Log
