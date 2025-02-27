@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { BaseModel } from "pocketbase";
   import { client } from ".";
-  import Dialog from "$lib/components/Dialog.svelte";
+  import * as Dialog from "$lib/components/ui/dialog/index.js";
 
   const {
     record,
@@ -15,18 +15,20 @@
 </script>
 
 {#if record && filename}
-  {@const src = client.getFileUrl(record, filename, { thumb: "100x100" })}
-  <Dialog>
-    {#snippet trigger(show)}
-      <button onclick={show} type="button" class="thumbnail">
-        <img {src} alt="todo" />
+  {@const thumbSrc = client.getFileUrl(record, filename, { thumb: "100x100" })}
+  <Dialog.Root>
+    <Dialog.Trigger>
+      <button type="button" class="thumbnail">
+        <img src={thumbSrc} alt="image preview" />
       </button>
-    {/snippet}
-    {#if !thumbOnly}
-      {@const src = client.getFileUrl(record, filename)}
-      <img {src} alt="todo" />
-    {/if}
-  </Dialog>
+    </Dialog.Trigger>
+    <Dialog.Content>
+      {#if !thumbOnly}
+        {@const fullSrc = client.getFileUrl(record, filename)}
+        <img src={fullSrc} alt="full size image" />
+      {/if}
+    </Dialog.Content>
+  </Dialog.Root>
 {/if}
 
 <style lang="scss">

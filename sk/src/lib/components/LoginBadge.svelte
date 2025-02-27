@@ -2,7 +2,7 @@
   import { onDestroy } from "svelte";
   import { authModel, client } from "../pocketbase";
   import Alerts, { alerts } from "./Alerts.svelte";
-  import Dialog from "./Dialog.svelte";
+  import * as Dialog from "$lib/components/ui/dialog/index.js";
   import LoginForm from "./LoginForm.svelte";
   const { signupAllowed = true } = $props();
   async function logout() {
@@ -22,9 +22,9 @@
 </script>
 
 {#if $authModel}
-  <Dialog>
-    {#snippet trigger(show)}
-      <button class="badge" onclick={show}>
+  <Dialog.Root>
+    <Dialog.Trigger>
+      <button class="badge">
         {#if $authModel.avatar}
           <img
             src={client.getFileUrl($authModel, $authModel.avatar)}
@@ -35,32 +35,44 @@
           >{$authModel?.name || $authModel?.username || $authModel?.email}</samp
         >
       </button>
-    {/snippet}
-    <div class="wrapper">
-      <div class="badge">
-        {#if $authModel.avatar}
-          <img
-            src={client.getFileUrl($authModel, $authModel.avatar)}
-            alt="profile pic"
-          />
-        {/if}
-        <samp
-          >{$authModel?.name ?? $authModel?.username ?? $authModel?.email}</samp
-        >
+    </Dialog.Trigger>
+    <Dialog.Content>
+      <Dialog.Header>
+        <Dialog.Title>Profile</Dialog.Title>
+      </Dialog.Header>
+      <div class="wrapper">
+        <div class="badge">
+          {#if $authModel.avatar}
+            <img
+              src={client.getFileUrl($authModel, $authModel.avatar)}
+              alt="profile pic"
+            />
+          {/if}
+          <samp
+            >{$authModel?.name ?? $authModel?.username ?? $authModel?.email}</samp
+          >
+        </div>
+        <Dialog.Footer>
+          <button onclick={logout}>Sign Out</button>
+        </Dialog.Footer>
       </div>
-      <button onclick={logout}>Sign Out</button>
-    </div>
-  </Dialog>
+    </Dialog.Content>
+  </Dialog.Root>
 {:else}
-  <Dialog>
-    {#snippet trigger(show)}
-      <button onclick={show}>
+  <Dialog.Root>
+    <Dialog.Trigger>
+      <button>
         {signupAllowed ? "Sign In / Sign Up" : "Sign In"}
       </button>
-    {/snippet}
-    <Alerts />
-    <LoginForm {signupAllowed} />
-  </Dialog>
+    </Dialog.Trigger>
+    <Dialog.Content>
+      <Dialog.Header>
+        <Dialog.Title>{signupAllowed ? "Sign In / Sign Up" : "Sign In"}</Dialog.Title>
+      </Dialog.Header>
+      <Alerts />
+      <LoginForm {signupAllowed} />
+    </Dialog.Content>
+  </Dialog.Root>
 {/if}
 
 <style lang="scss">

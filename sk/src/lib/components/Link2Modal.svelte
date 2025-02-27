@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import type { ComponentType, Snippet, SvelteComponent } from "svelte";
   import Alerts from "./Alerts.svelte";
+  import * as Dialog from "$lib/components/ui/dialog/index.js";
 
   const {
     component,
@@ -12,7 +13,7 @@
     component: ComponentType<SvelteComponent<{ data: any }>>;
   } = $props();
 
-  let dialog: HTMLDialogElement | undefined = $state();
+  let isOpen = $state(false);
 
   async function onclick(e: MouseEvent) {
     if (e.metaKey || e.ctrlKey) return;
@@ -28,38 +29,29 @@
     }
   }
 
-  async function onclose() {
+  async function onClose() {
     await invalidateAll();
     history.back();
   }
 
   $effect(() => {
-    if ($page.state.selected && dialog) {
-      dialog.showModal();
+    if ($page.state.selected) {
+      isOpen = true;
     }
   });
 </script>
 
 {#if $page.state.selected}
-  <dialog bind:this={dialog} {onclose}>
-    <button type="button" class="dismiss" onclick={onclose}>&times;</button>
-    <Alerts />
-    <h2>{$page.state.selected.metadata.headline}</h2>
-    <svelte:component this={component} data={$page.state.selected} />
-  </dialog>
+  <Dialog.Root bind:open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog.Content>
+      <Dialog.Header>
+        <Dialog.Title>{$page.state.selected.metadata.headline}</Dialog.Title>
+        <Dialog.Close />
+      </Dialog.Header>
+      <Alerts />
+      <svelte:component this={component} data={$page.state.selected} />
+    </Dialog.Content>
+  </Dialog.Root>
 {/if}
 
 {@render trigger(onclick)}
-
-<style>
-  .dismiss {
-    border-radius: 5rem;
-    padding: 0 0;
-    width: 2em;
-    height: 2em;
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 6px 6px;
-  }
-</style>
