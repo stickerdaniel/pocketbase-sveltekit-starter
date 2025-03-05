@@ -52,12 +52,25 @@
         
         const files = fileInput?.files;
         const user = client.authStore.isAdmin ? "" : $authModel?.id;
+        
+        // Step 1: Create the record with normal fields first
         record = await save<PostsResponse>("posts", {
           ...data,
           files,
           user,
-          "files-": toBeRemoved,
         });
+        
+        // Step 2: Process each file deletion as a separate request
+        if (toBeRemoved.length > 0) {
+          for (const file of toBeRemoved) {
+            await client.collection("posts").update(record.id, {
+              "files-": [file]
+            });
+          }
+          // Refresh the record to get the updated files list
+          record = await client.collection("posts").getOne(record.id);
+        }
+        
         toast.success("Post saved.");
         history.back();
       } else {
