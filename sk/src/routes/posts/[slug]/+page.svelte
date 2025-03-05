@@ -78,17 +78,16 @@
   <Card>
     <CardContent class="p-6">
       <article>
+        {#if record.files && record.files.length > 0}
+          <div class="flex flex-wrap gap-4 mb-6 justify-start">
+            {#each record.files as file, index}
+              {@const title = `image ${index + 1} for: ${record.title}`}
+              <ImgModal {record} filename={file} />
+            {/each}
+          </div>
+        {/if}
         <h1 class="text-2xl font-bold mb-4">{record.title}</h1>
         <pre class="body whitespace-pre-wrap mb-8">{record.body}</pre>
-        <div class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {#each record.files ?? [] as file, index}
-            {@const src = client.files.getUrl(record, file)}
-            {@const title = `image ${index + 1} for: ${record.title}`}
-            <div class="overflow-hidden rounded-md">
-              <ImgModal {record} filename={file} />
-            </div>
-          {/each}
-        </div>
       </article>
     </CardContent>
   </Card>
