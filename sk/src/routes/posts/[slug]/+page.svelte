@@ -9,7 +9,6 @@
   import { goto } from "$app/navigation";
   import Edit from "lucide-svelte/icons/edit";
   import Trash from "lucide-svelte/icons/trash";
-  import FileText from "lucide-svelte/icons/file-text";
   import ClipboardList from "lucide-svelte/icons/clipboard-list";
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
 
@@ -35,10 +34,6 @@
 <SidebarPage title={record.title}>
   {#if $authModel}
     <div class="mb-4">
-      <Button variant="outline" href={`${base}/posts/${record.slug || record.id}`}>
-        <FileText class="mr-2 h-4 w-4" />
-        View
-      </Button>
       <Button variant="outline" href={`${base}/posts/${record.slug || record.id}/edit`}>
         <Edit class="mr-2 h-4 w-4" />
         Edit

@@ -22,7 +22,7 @@
   });
   // Create a loading state store
   const isGenerating = writable(false);
-  
+
   // Function to generate a random post
   async function generateRandomPost() {
     try {
@@ -46,12 +46,32 @@
         <Button variant="default" href={`${base}/posts/new/edit`}>
           New Post
         </Button>
-        <Button variant="outline" onclick={generateRandomPost} disabled={$isGenerating}>
+        <Button
+          variant="outline"
+          onclick={generateRandomPost}
+          disabled={$isGenerating}
+        >
           {#if $isGenerating}
             <span class="mr-2">
-              <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                class="h-4 w-4 animate-spin"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
             </span>
           {/if}
@@ -66,13 +86,11 @@
     </div>
   </div>
 
-  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+  <div class="grid grow gap-6 md:grid-cols-2 lg:grid-cols-4">
     {#each $posts.items as item}
       {@const [file] = item.files}
       <a href={`${base}/posts/${item.slug || item.id}`} class="group block">
-        <Card.Root
-          class="h-full overflow-hidden transition-all hover:shadow-md"
-        >
+        <Card.Root class="overflow-hidden transition-all hover:shadow-md">
           <div class="relative">
             <AspectRatio ratio={16 / 9} class="bg-muted/30">
               <Image record={item} {file} class="h-full w-full object-cover" />
@@ -100,7 +118,9 @@
         </Card.Root>
       </a>
     {:else}
-      <div class="col-span-full py-12 text-center text-muted-foreground">
+      <div
+        class="col-span-full py-12 text-center text-muted-foreground grow flex flex-col justify-center"
+      >
         <p class="text-lg">No posts found.</p>
         <p class="mt-2">Create some new posts to get started.</p>
       </div>
