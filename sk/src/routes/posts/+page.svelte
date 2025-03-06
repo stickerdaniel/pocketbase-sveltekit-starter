@@ -27,11 +27,45 @@
   async function generateRandomPost() {
     try {
       isGenerating.set(true);
-      await client.send("/api/generate", { method: "post" });
+      console.log("Starting random post generation...");
+
+      const response = await client.send("/api/generate", {
+        method: "post",
+        // Add a timeout to ensure we don't wait indefinitely
+        timeout: 30000,
+      });
+
+      console.log("API response:", response);
       toast.success("Random post generated");
+
+      // Reload the page to show the new post
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
-      toast.error("Failed to generate random post");
-      console.error(error);
+      console.error("Post generation error:", error);
+
+      // Try to extract more detailed error info
+      let errorMessage = "Failed to generate random post";
+
+      if (error.data) {
+        // PocketBase Client returns error details in the data property
+        if (error.data.error) {
+          errorMessage = `Error: ${error.data.error}`;
+
+          if (error.data.details) {
+            console.error("Error details:", error.data.details);
+            errorMessage += ` - ${typeof error.data.details === "object" ? JSON.stringify(error.data.details) : error.data.details}`;
+          }
+        }
+      } else if (error.message) {
+        errorMessage = `Error: ${error.message}`;
+      }
+
+      // Show the detailed error message
+      toast.error(errorMessage, {
+        duration: 8000, // Show longer so user can read
+      });
     } finally {
       isGenerating.set(false);
     }

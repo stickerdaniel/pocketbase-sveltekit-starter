@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "bunx --bun vite dev",
-    "dev:backend": "cd ../pb && go install github.com/cortesi/modd/cmd/modd@latest && modd",
+    "dev:backend": "cd ../pb && . ../.env && go install github.com/cortesi/modd/cmd/modd@latest && modd",
     "backend": "AUDITLOG=users,posts ../pb/entrypoint.sh ./pocketbase serve --publicDir=../sk/build",
     "build": "bunx --bun vite build",
     "build:backend": "cd ../pb && go build",

@@ -12,6 +12,7 @@ services:
     environment:
       - HOME=/app/pb
       - AUDITLOG=${AUDITLOG}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     volumes:
       - ${PWD}/pb:/app/pb
       - ${PWD}/sk:/app/sk
