@@ -20,6 +20,7 @@
   $effect(() => {
     data.metadata.title = data.metadata.headline = "Posts";
   });
+
   // Create a loading state store
   const isGenerating = writable(false);
 
@@ -29,6 +30,12 @@
       isGenerating.set(true);
       console.log("Starting random post generation...");
 
+      // Show a detailed toast to let the user know we're generating a post
+      toast.loading("Generating blog post with Gemini AI...", {
+        id: "generate-post",
+        duration: 30000, // Long timeout since generation can take time
+      });
+
       const response = await client.send("/api/generate", {
         method: "post",
         // Add a timeout to ensure we don't wait indefinitely
@@ -36,14 +43,63 @@
       });
 
       console.log("API response:", response);
-      toast.success("Random post generated");
 
-      // Reload the page to show the new post
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Now we can access the structured data
+      if (response && response.record) {
+        // Dismiss the loading toast
+        toast.dismiss("generate-post");
+
+        // Show success toast with title and summary if available
+        if (response.record.summary) {
+          // Use string template for toast message instead of JSX
+          toast.success(`${response.record.title}`, {
+            duration: 5000,
+            description: "Post generated successfully",
+          });
+        } else {
+          toast.success(
+            `Post "${response.record.title}" generated successfully`,
+            {
+              duration: 3000,
+            }
+          );
+        }
+
+        // Navigate to the newly created post
+        setTimeout(() => {
+          window.location.href = `${base}/posts/${response.record.slug || response.record.id}`;
+        }, 1500);
+      } else {
+        // Dismiss the loading toast
+        toast.dismiss("generate-post");
+        toast.success("Random post generated");
+
+        // Fallback to page reload if we don't have structured data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
     } catch (error) {
       console.error("Post generation error:", error);
+
+      // Dismiss the loading toast
+      toast.dismiss("generate-post");
+
+      // Check for missing Gemini API key specifically
+      if (error?.data?.error?.includes("GEMINI_API_KEY not configured")) {
+        toast.error(
+          "Missing Gemini API key. Please set the GEMINI_API_KEY environment variable.",
+          {
+            duration: 8000,
+            action: {
+              label: "Learn more",
+              onClick: () =>
+                window.open("https://ai.google.dev/tutorials/setup", "_blank"),
+            },
+          }
+        );
+        return;
+      }
 
       // Try to extract more detailed error info
       let errorMessage = "Failed to generate random post";
@@ -60,6 +116,9 @@
         }
       } else if (error.message) {
         errorMessage = `Error: ${error.message}`;
+      } else if (error.status === 404) {
+        errorMessage =
+          "API endpoint not found. Make sure the backend server is running properly.";
       }
 
       // Show the detailed error message
@@ -109,7 +168,7 @@
               </svg>
             </span>
           {/if}
-          Generate Random Post
+          Generate with AI
         </Button>
         {#snippet otherwise()}
           <p class="text-muted-foreground text-sm">
@@ -120,7 +179,7 @@
     </div>
   </div>
 
-  <div class="grid grow gap-6 md:grid-cols-2 lg:grid-cols-4">
+  <div class="grid grow gap-6 md:grid-cols-2 lg:grid-cols-3">
     {#each $posts.items as item}
       {@const [file] = item.files}
       <a href={`${base}/posts/${item.slug || item.id}`} class="group block">

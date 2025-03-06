@@ -104,7 +104,6 @@ routerAdd(
 
     // Get Gemini API key from PocketBase environment
     const apiKey = $os.getenv("GEMINI_API_KEY");
-
     console.log("[DEBUG] GEMINI_API_KEY available:", !!apiKey);
     if (!apiKey) {
       console.log("[ERROR] GEMINI_API_KEY not configured in environment");
@@ -124,14 +123,46 @@ routerAdd(
     const randomTopic = topics[Math.floor(Math.random() * topics.length)];
     console.log("[DEBUG] Selected topic:", randomTopic);
 
-    // Call Gemini API
+    // Call Gemini API with structured output prompt
     try {
       console.log("[DEBUG] Preparing Gemini API call");
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+      // Request structured output using JSON schema specification in the prompt
+      const prompt = `${randomTopic}
+      Do not repeat the topic/title in the body of the blog post.
+      Please use markdown formatting for the body of the blog post. If suitable, you can include short code snippets or examples.
+      Make sure the title is engaging, the body is comprehensive and well-structured with paragraphs.`;
+
+      // Define the response schema using Gemini's schema format
+      const schema = {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Concise, catchy title for the blog post"
+          },
+          "body": {
+            "type": "string",
+            "description": "Full blog post content with proper formatting and paragraphs"
+          },
+        },
+        "required": ["title", "body"],
+        "propertyOrdering": ["title", "body"]
+      };
+
       const payload = {
         contents: [{
-          parts: [{ text: randomTopic }]
-        }]
+          parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 2048,
+          responseMimeType: "application/json",
+          responseSchema: schema
+        }
       };
 
       console.log("[DEBUG] Sending request to Gemini API");
@@ -143,7 +174,6 @@ routerAdd(
       });
 
       console.log("[DEBUG] Gemini API response status:", response.statusCode);
-
       if (response.statusCode !== 200) {
         console.log("[ERROR] Gemini API error response:", response.raw);
         return c.json(response.statusCode, {
@@ -163,25 +193,62 @@ routerAdd(
         });
       }
 
-      const generatedText = responseData.candidates[0].content.parts[0].text;
-      console.log("[DEBUG] Generated text (first 100 chars):", generatedText.substring(0, 100) + "...");
+      console.log("[DEBUG] Successfully received Gemini API response");
 
-      // Extract title from first sentence
-      const firstSentenceMatch = generatedText.match(/^([^.!?]+[.!?])\s*/);
-      const title = firstSentenceMatch ? firstSentenceMatch[1].trim() : "Generated Post";
-      console.log("[DEBUG] Extracted title:", title);
+      // Extract the JSON content from the response
+      let generatedContent;
+      try {
+        const contentText = responseData.candidates[0].content.parts[0].text;
+        // Parse the JSON content - this should be properly formatted due to our schema
+        generatedContent = JSON.parse(contentText);
+        console.log("[DEBUG] Successfully parsed JSON content");
+      } catch (parseError) {
+        console.log("[ERROR] Failed to parse JSON content:", parseError);
+        console.log("[DEBUG] Raw content:", responseData.candidates[0].content.parts[0].text);
 
-      // Remove the title from the body if it was extracted
-      let body = generatedText;
-      if (firstSentenceMatch) {
-        body = generatedText.substring(firstSentenceMatch[0].length).trim();
+        // Fallback: Try to extract content even if not perfect JSON
+        const rawText = responseData.candidates[0].content.parts[0].text;
+
+        // Handle case where JSON might be wrapped in markdown code blocks
+        const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
+          rawText.match(/\{[\s\S]*\}/);
+
+        if (jsonMatch) {
+          try {
+            generatedContent = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+            console.log("[DEBUG] Extracted JSON from code block");
+          } catch (e) {
+            console.log("[ERROR] Failed to parse extracted JSON:", e);
+            // Fall back to default structure with raw content
+            generatedContent = {
+              title: "Generated Blog Post",
+              body: rawText,
+            };
+          }
+        } else {
+          // Complete fallback if we can't extract JSON
+          const firstSentenceMatch = rawText.match(/^([^.!?]+[.!?])\s*/);
+          const title = firstSentenceMatch ? firstSentenceMatch[1].trim() : "Generated Post";
+          const body = firstSentenceMatch ?
+            rawText.substring(firstSentenceMatch[0].length).trim() :
+            rawText;
+
+          generatedContent = {
+            title: title,
+            body: body,
+          };
+        }
       }
 
-      const slug = title
+      console.log("[DEBUG] Generated title:", generatedContent.title);
+
+      // Generate a slug from the title
+      const slug = generatedContent.title
         .toLowerCase()
         .replace(/[^a-z0-9\s]/g, '')
         .replace(/\s+/g, '-')
         .substring(0, 60);
+
       console.log("[DEBUG] Generated slug:", slug);
 
       // Create post record
@@ -191,16 +258,24 @@ routerAdd(
       const user = c.get("authRecord");
       console.log("[DEBUG] User authenticated:", !!user);
 
-      const record = new Record(coll, { title, body, slug, user: user?.id });
+      const record = new Record(coll, {
+        title: generatedContent.title,
+        body: generatedContent.body,
+        slug: slug,
+        user: user?.id
+      });
       const form = new RecordUpsertForm($app, record);
 
-      // Still using picsum.photos for random images
+      // Add random images from picsum.photos
       console.log("[DEBUG] Fetching images from picsum.photos");
       try {
+        // Add random seed to prevent caching
+        const seed1 = Math.floor(Math.random() * 1000);
+        const seed2 = Math.floor(Math.random() * 1000);
         form.addFiles(
           "files",
-          $filesystem.fileFromUrl("https://picsum.photos/500/300"),
-          $filesystem.fileFromUrl("https://picsum.photos/500/300")
+          $filesystem.fileFromUrl(`https://picsum.photos/seed/${seed1}/500/300`),
+          $filesystem.fileFromUrl(`https://picsum.photos/seed/${seed2}/500/300`)
         );
         console.log("[DEBUG] Images added successfully");
       } catch (imgError) {
@@ -212,7 +287,16 @@ routerAdd(
       form.submit();
       console.log("[DEBUG] Record created successfully");
 
-      c.json(200, record);
+      // Return structured data with post information and the original generated content
+      return c.json(200, {
+        record: {
+          id: record.id,
+          title: record.get("title"),
+          body: record.get("body"),
+          slug: record.get("slug"),
+        },
+        message: "Post generated successfully with Gemini API"
+      });
     } catch (err) {
       console.error("[ERROR] Error generating post:", err);
       return c.json(500, {
