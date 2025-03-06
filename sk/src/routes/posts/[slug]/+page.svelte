@@ -11,6 +11,7 @@
   import Trash from "lucide-svelte/icons/trash";
   import ClipboardList from "lucide-svelte/icons/clipboard-list";
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
+  import MarkdownContent from "$lib/components/MarkdownContent.svelte";
 
   const { data } = $props();
   const record = $derived(data.record);
@@ -91,7 +92,7 @@
           </div>
         {/if}
         <h1 class="mb-4 text-2xl font-bold">{record.title}</h1>
-        <pre class="body mb-8 whitespace-pre-wrap">{record.body}</pre>
+        <MarkdownContent content={record.body} />
       </article>
     </CardContent>
   </Card>
