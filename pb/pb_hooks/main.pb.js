@@ -102,15 +102,13 @@ routerAdd(
   (c) => {
     console.log("[DEBUG] Starting random post generation");
 
-    // Get Gemini API key from config
-    const { parseJSONFile } = require(`${__hooks}/util`);
-    const config = parseJSONFile(`${__hooks}/config.json`);
-    const apiKey = config.geminiApiKey;
+    // Get Gemini API key from PocketBase environment
+    const apiKey = $os.getenv("GEMINI_API_KEY");
 
-    console.log("[DEBUG] GEMINI_API_KEY available:", apiKey);
+    console.log("[DEBUG] GEMINI_API_KEY available:", !!apiKey);
     if (!apiKey) {
-      console.log("[ERROR] GEMINI_API_KEY not configured in config");
-      return c.json(500, { error: "GEMINI_API_KEY not configured in config" });
+      console.log("[ERROR] GEMINI_API_KEY not configured in environment");
+      return c.json(500, { error: "GEMINI_API_KEY not configured in environment" });
     }
 
     // Generate random content topic - alternate between Svelte 5 and PocketBase
