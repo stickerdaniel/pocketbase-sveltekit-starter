@@ -21,7 +21,7 @@
   // Action handlers
   async function handleDelete() {
     try {
-      await client.collection('posts').delete(record.id);
+      await client.collection("posts").delete(record.id);
       toast.success("Post deleted successfully");
       goto(`${base}/posts`);
     } catch (error) {
@@ -33,13 +33,16 @@
 
 <SidebarPage title={record.title}>
   {#if $authModel}
-    <div class="mb-4">
-      <Button variant="outline" href={`${base}/posts/${record.slug || record.id}/edit`}>
+    <div class="mt-4">
+      <Button
+        variant="outline"
+        href={`${base}/posts/${record.slug || record.id}/edit`}
+      >
         <Edit class="mr-2 h-4 w-4" />
         Edit
       </Button>
       <AlertDialog.Root>
-        <AlertDialog.Trigger asChild>
+        <AlertDialog.Trigger>
           <div>
             <Button variant="outline">
               <Trash class="mr-2 h-4 w-4" />
@@ -51,14 +54,15 @@
           <AlertDialog.Header>
             <AlertDialog.Title>Delete Post</AlertDialog.Title>
             <AlertDialog.Description>
-              Are you sure you want to delete "{record.title}"? This action cannot be undone.
+              Are you sure you want to delete "{record.title}"? This action
+              cannot be undone.
             </AlertDialog.Description>
           </AlertDialog.Header>
           <AlertDialog.Footer>
             <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
             <div>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onclick={handleDelete}
                 class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
@@ -79,15 +83,15 @@
     <CardContent class="p-6">
       <article>
         {#if record.files && record.files.length > 0}
-          <div class="flex flex-wrap gap-4 mb-6 justify-start">
+          <div class="mb-6 flex flex-wrap justify-start gap-4">
             {#each record.files as file, index}
               {@const title = `image ${index + 1} for: ${record.title}`}
               <ImgModal {record} filename={file} />
             {/each}
           </div>
         {/if}
-        <h1 class="text-2xl font-bold mb-4">{record.title}</h1>
-        <pre class="body whitespace-pre-wrap mb-8">{record.body}</pre>
+        <h1 class="mb-4 text-2xl font-bold">{record.title}</h1>
+        <pre class="body mb-8 whitespace-pre-wrap">{record.body}</pre>
       </article>
     </CardContent>
   </Card>
