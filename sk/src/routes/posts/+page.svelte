@@ -1,10 +1,7 @@
 <script lang="ts">
   import { base } from "$app/paths";
-  import DateShow from "$lib/components/DateShow.svelte";
   import Image from "$lib/pocketbase/Image.svelte";
-  import Link2Modal from "$lib/components/Link2Modal.svelte";
   import { client } from "$lib/pocketbase";
-  import EditPage from "./[slug]/edit/+page.svelte";
   import LoginGuard from "$lib/components/LoginGuard.svelte";
   import Paginator from "$lib/pocketbase/Paginator.svelte";
   import { writable } from "svelte/store";
