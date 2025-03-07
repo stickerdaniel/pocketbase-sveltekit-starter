@@ -35,6 +35,9 @@ The project can be set up in three ways:
 - shadcn-ui components look great out of the box - avoid adding unnecessary Tailwind classes to them
 
 ## Coding Style
+- Use Bun as the JavaScript runtime and package manager
+  - Use `bun install` for dependencies
+  - Use `bun run` for scripts
 - Use Svelte 5 features including runes ($state, $derived, etc.) for reactive state management
 - Use Tailwind CSS classes for styling
   - Prefer Tailwind utility classes over custom CSS
