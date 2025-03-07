@@ -280,8 +280,8 @@ routerAdd(
           // Generate the specified number of images with different seeds
           for (let i = 0; i < numImages; i++) {
             // Use different sizes and random seeds for variety
-            const width = 500 + Math.floor(Math.random() * 300); // 500-799px width
-            const height = 300 + Math.floor(Math.random() * 200); // 300-499px height
+            const width = 1000 + Math.floor(Math.random() * 300); // 1000-1299px width
+            const height = 600 + Math.floor(Math.random() * 200); // 600-799px height
             const seed = Math.floor(Math.random() * 1000);
 
             // Add image to array

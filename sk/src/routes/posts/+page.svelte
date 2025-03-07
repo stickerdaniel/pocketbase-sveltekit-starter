@@ -186,7 +186,12 @@
         <Card.Root class="overflow-hidden transition-all hover:shadow-md">
           <div class="relative">
             <AspectRatio ratio={16 / 9} class="bg-muted/30">
-              <Image record={item} {file} class="h-full w-full object-cover" />
+              <Image 
+                record={item} 
+                {file} 
+                thumb="800x450" 
+                class="h-full w-full object-cover" 
+              />
             </AspectRatio>
           </div>
           <Card.Content class="p-4">
