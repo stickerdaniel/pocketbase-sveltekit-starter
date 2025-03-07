@@ -192,11 +192,13 @@
     </div>
   </div>
 
-  <div class="grid grow gap-6 md:grid-cols-2 lg:grid-cols-3">
+  <div class="grid auto-rows-fr gap-6 md:grid-cols-2 lg:grid-cols-3">
     {#each $posts.items as item}
       {@const [file] = item.files}
       <a href={`${base}/posts/${item.slug || item.id}`} class="group block">
-        <Card.Root class="overflow-hidden transition-all hover:shadow-md">
+        <Card.Root
+          class="flex h-full flex-col overflow-hidden transition-all hover:shadow-md"
+        >
           <div class="relative">
             <AspectRatio ratio={16 / 9} class="bg-muted/30">
               <Image
@@ -207,13 +209,15 @@
               />
             </AspectRatio>
           </div>
-          <Card.Content class="p-4">
+          <Card.Content class="flex flex-1 flex-col p-4">
             <h2
               class="group-hover:text-primary mb-2 line-clamp-2 text-xl font-semibold transition-colors"
             >
               {item.title}
             </h2>
-            <div class="text-muted-foreground flex items-center gap-3 text-sm">
+            <div
+              class="text-muted-foreground mt-auto flex items-center gap-3 text-sm"
+            >
               <span class="inline-flex items-center gap-1.5">
                 <Calendar size={14} />
                 <span>{new Date(item.updated).toLocaleDateString()}</span>
