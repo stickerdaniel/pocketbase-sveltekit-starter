@@ -145,103 +145,108 @@
 </script>
 
 <SidebarPage title="Posts">
-  <div class="mb-6 flex items-center justify-between">
-    <h1 class="text-2xl font-bold">Blog Posts</h1>
-    <div class="flex space-x-2">
-      <LoginGuard>
-        <Button variant="default" href={`${base}/posts/new/edit`}>
-          New Post
-        </Button>
-        <Button
-          variant="outline"
-          onclick={generateRandomPost}
-          disabled={$isGenerating}
-        >
-          {#if $isGenerating}
-            <span class="mr-2">
-              <svg
-                class="h-4 w-4 animate-spin"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
+  <div class="flex min-h-full flex-col">
+    <div class="mb-6 flex items-center justify-between">
+      <h1 class="text-2xl font-bold">Blog Posts</h1>
+      <div class="flex space-x-2">
+        <LoginGuard>
+          <Button variant="default" href={`${base}/posts/new/edit`}>
+            New Post
+          </Button>
+          <Button
+            variant="outline"
+            onclick={generateRandomPost}
+            disabled={$isGenerating}
+          >
+            {#if $isGenerating}
+              <span class="mr-2">
+                <svg
+                  class="h-4 w-4 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </span>
+            {/if}
+            Generate with AI
+          </Button>
+          {#snippet otherwise()}
+            <p class="text-muted-foreground text-sm">
+              Please Sign In to create/edit posts.
+            </p>
+          {/snippet}
+        </LoginGuard>
+      </div>
+    </div>
+
+    <div
+      class="grid flex-1 auto-rows-fr gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+    >
+      {#each $posts.items as item}
+        {@const [file] = item.files}
+        <a href={`${base}/posts/${item.slug || item.id}`} class="group block">
+          <Card.Root
+            class="flex h-full flex-col overflow-hidden transition-all hover:shadow-md"
+          >
+            <div class="relative">
+              <AspectRatio ratio={16 / 9} class="bg-muted/30">
+                <Image
+                  record={item}
+                  {file}
+                  thumb="800x450"
+                  class="h-full w-full object-cover"
+                />
+              </AspectRatio>
+            </div>
+            <Card.Content class="flex flex-1 flex-col p-4">
+              <h2
+                class="group-hover:text-primary mb-2 line-clamp-2 text-xl font-semibold transition-colors"
               >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-            </span>
-          {/if}
-          Generate with AI
-        </Button>
-        {#snippet otherwise()}
-          <p class="text-muted-foreground text-sm">
-            Please Sign In to create/edit posts.
-          </p>
-        {/snippet}
-      </LoginGuard>
+                {item.title}
+              </h2>
+              <div
+                class="text-muted-foreground mt-auto flex items-center gap-3 text-sm"
+              >
+                <span class="inline-flex items-center gap-1.5">
+                  <Calendar size={14} />
+                  <span>{new Date(item.updated).toLocaleDateString()}</span>
+                </span>
+                {#if item.expand?.user?.name}
+                  <span class="inline-flex items-center gap-1.5">
+                    <User size={14} />
+                    <span>{item.expand.user.name}</span>
+                  </span>
+                {/if}
+              </div>
+            </Card.Content>
+          </Card.Root>
+        </a>
+      {:else}
+        <div
+          class="col-span-full py-12 text-center text-muted-foreground grow flex flex-col justify-center"
+        >
+          <p class="text-lg">No posts found.</p>
+          <p class="mt-2">Create some new posts to get started.</p>
+        </div>
+      {/each}
+    </div>
+
+    <div class="mt-6">
+      <Paginator store={posts} showIfSinglePage={true} />
     </div>
   </div>
-
-  <div
-    class="grid auto-rows-fr gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-  >
-    {#each $posts.items as item}
-      {@const [file] = item.files}
-      <a href={`${base}/posts/${item.slug || item.id}`} class="group block">
-        <Card.Root
-          class="flex h-full flex-col overflow-hidden transition-all hover:shadow-md"
-        >
-          <div class="relative">
-            <AspectRatio ratio={16 / 9} class="bg-muted/30">
-              <Image
-                record={item}
-                {file}
-                thumb="800x450"
-                class="h-full w-full object-cover"
-              />
-            </AspectRatio>
-          </div>
-          <Card.Content class="flex flex-1 flex-col p-4">
-            <h2
-              class="group-hover:text-primary mb-2 line-clamp-2 text-xl font-semibold transition-colors"
-            >
-              {item.title}
-            </h2>
-            <div
-              class="text-muted-foreground mt-auto flex items-center gap-3 text-sm"
-            >
-              <span class="inline-flex items-center gap-1.5">
-                <Calendar size={14} />
-                <span>{new Date(item.updated).toLocaleDateString()}</span>
-              </span>
-              {#if item.expand?.user?.name}
-                <span class="inline-flex items-center gap-1.5">
-                  <User size={14} />
-                  <span>{item.expand.user.name}</span>
-                </span>
-              {/if}
-            </div>
-          </Card.Content>
-        </Card.Root>
-      </a>
-    {:else}
-      <div
-        class="col-span-full py-12 text-center text-muted-foreground grow flex flex-col justify-center"
-      >
-        <p class="text-lg">No posts found.</p>
-        <p class="mt-2">Create some new posts to get started.</p>
-      </div>
-    {/each}
-  </div>
-  <Paginator store={posts} showIfSinglePage={true} />
 </SidebarPage>
