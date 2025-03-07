@@ -29,24 +29,25 @@
 
 {#if showIfSinglePage || $store.totalPages > 1}
   <div class="my-4 flex justify-center">
-    <Pagination.Root 
-      count={$store.totalItems} 
-      perPage={$store.perPage} 
+    <Pagination.Root
+      count={$store.totalItems}
+      perPage={$store.perPage}
       page={currentPage}
       on:pageChange={(e) => handlePageChange(e.detail)}
-      siblingCount={1}>
+      siblingCount={1}
+    >
       {#snippet children({ pages, currentPage })}
         <Pagination.Content>
           <Pagination.Item>
-            <Pagination.PrevButton 
+            <Pagination.PrevButton
               onclick={() => {
                 if (currentPage > 1) {
                   handlePageChange(currentPage - 1);
                 }
-              }} 
+              }}
             />
           </Pagination.Item>
-          
+
           {#each pages as page (page.key)}
             {#if page.type === "ellipsis"}
               <Pagination.Item>
@@ -54,8 +55,8 @@
               </Pagination.Item>
             {:else}
               <Pagination.Item>
-                <Pagination.Link 
-                  {page} 
+                <Pagination.Link
+                  {page}
                   isActive={currentPage === page.value}
                   onclick={() => {
                     if (page.value !== currentPage) {
@@ -66,14 +67,14 @@
               </Pagination.Item>
             {/if}
           {/each}
-          
+
           <Pagination.Item>
-            <Pagination.NextButton 
+            <Pagination.NextButton
               onclick={() => {
                 if (currentPage < $store.totalPages) {
                   handlePageChange(currentPage + 1);
                 }
-              }} 
+              }}
             />
           </Pagination.Item>
         </Pagination.Content>

@@ -24,6 +24,16 @@
   // Create a loading state store
   const isGenerating = writable(false);
 
+  // Error type from PocketBase client
+  interface PBError {
+    data?: {
+      error?: string;
+      details?: Record<string, unknown> | string;
+    };
+    message?: string;
+    status?: number;
+  }
+
   // Function to generate a random post
   async function generateRandomPost() {
     try {
@@ -85,8 +95,11 @@
       // Dismiss the loading toast
       toast.dismiss("generate-post");
 
+      // Cast error to our PBError interface for proper type checking
+      const pbError = error as PBError;
+
       // Check for missing Gemini API key specifically
-      if (error?.data?.error?.includes("GEMINI_API_KEY not configured")) {
+      if (pbError.data?.error?.includes("GEMINI_API_KEY not configured")) {
         toast.error(
           "Missing Gemini API key. Please set the GEMINI_API_KEY environment variable.",
           {
@@ -104,19 +117,19 @@
       // Try to extract more detailed error info
       let errorMessage = "Failed to generate random post";
 
-      if (error.data) {
+      if (pbError.data) {
         // PocketBase Client returns error details in the data property
-        if (error.data.error) {
-          errorMessage = `Error: ${error.data.error}`;
+        if (pbError.data.error) {
+          errorMessage = `Error: ${pbError.data.error}`;
 
-          if (error.data.details) {
-            console.error("Error details:", error.data.details);
-            errorMessage += ` - ${typeof error.data.details === "object" ? JSON.stringify(error.data.details) : error.data.details}`;
+          if (pbError.data.details) {
+            console.error("Error details:", pbError.data.details);
+            errorMessage += ` - ${typeof pbError.data.details === "object" ? JSON.stringify(pbError.data.details) : pbError.data.details}`;
           }
         }
-      } else if (error.message) {
-        errorMessage = `Error: ${error.message}`;
-      } else if (error.status === 404) {
+      } else if (pbError.message) {
+        errorMessage = `Error: ${pbError.message}`;
+      } else if (pbError.status === 404) {
         errorMessage =
           "API endpoint not found. Make sure the backend server is running properly.";
       }
@@ -186,11 +199,11 @@
         <Card.Root class="overflow-hidden transition-all hover:shadow-md">
           <div class="relative">
             <AspectRatio ratio={16 / 9} class="bg-muted/30">
-              <Image 
-                record={item} 
-                {file} 
-                thumb="800x450" 
-                class="h-full w-full object-cover" 
+              <Image
+                record={item}
+                {file}
+                thumb="800x450"
+                class="h-full w-full object-cover"
               />
             </AspectRatio>
           </div>
@@ -224,5 +237,5 @@
       </div>
     {/each}
   </div>
-  <Paginator store={posts} showIfSinglePage={true} class="mt-6" />
+  <Paginator store={posts} showIfSinglePage={true} />
 </SidebarPage>
