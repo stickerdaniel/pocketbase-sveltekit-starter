@@ -266,18 +266,36 @@ routerAdd(
       });
       const form = new RecordUpsertForm($app, record);
 
-      // Add random images from picsum.photos
-      console.log("[DEBUG] Fetching images from picsum.photos");
+      // Add random number of images (0-4) from picsum.photos
+      console.log("[DEBUG] Preparing images for post");
       try {
-        // Add random seed to prevent caching
-        const seed1 = Math.floor(Math.random() * 1000);
-        const seed2 = Math.floor(Math.random() * 1000);
-        form.addFiles(
-          "files",
-          $filesystem.fileFromUrl(`https://picsum.photos/seed/${seed1}/500/300`),
-          $filesystem.fileFromUrl(`https://picsum.photos/seed/${seed2}/500/300`)
-        );
-        console.log("[DEBUG] Images added successfully");
+        // Generate a random number of images between 0 and 4
+        const numImages = Math.floor(Math.random() * 5); // 0-4 images
+        console.log(`[DEBUG] Adding ${numImages} random images to the post`);
+
+        if (numImages > 0) {
+          // Create array to hold image files
+          const imageFiles = [];
+
+          // Generate the specified number of images with different seeds
+          for (let i = 0; i < numImages; i++) {
+            // Use different sizes and random seeds for variety
+            const width = 500 + Math.floor(Math.random() * 300); // 500-799px width
+            const height = 300 + Math.floor(Math.random() * 200); // 300-499px height
+            const seed = Math.floor(Math.random() * 1000);
+
+            // Add image to array
+            imageFiles.push(
+              $filesystem.fileFromUrl(`https://picsum.photos/seed/${seed}/${width}/${height}`)
+            );
+          }
+
+          // Add all files at once
+          form.addFiles("files", ...imageFiles);
+          console.log("[DEBUG] Images added successfully");
+        } else {
+          console.log("[DEBUG] No images added to this post");
+        }
       } catch (imgError) {
         console.log("[ERROR] Error adding images:", imgError);
         // Continue anyway, images are not critical
@@ -294,6 +312,7 @@ routerAdd(
           title: record.get("title"),
           body: record.get("body"),
           slug: record.get("slug"),
+          imageCount: record.get("files")?.length || 0
         },
         message: "Post generated successfully with Gemini API"
       });
