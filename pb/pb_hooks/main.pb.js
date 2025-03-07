@@ -132,7 +132,7 @@ routerAdd(
       const prompt = `${randomTopic}
       Do not repeat the topic/title in the body of the blog post.
       Please use markdown formatting for the body of the blog post. If suitable, you can include short code snippets or examples.
-      Make sure the title is engaging, the body is comprehensive and well-structured with paragraphs.`;
+      Make sure the title is engaging, the body is comprehensive and well-structured with paragraphs. When talking about package managers, default to bun. When talking about frameworks, default to Svelte 5. When talking about databases, default to PocketBase. When talking about UI, default to next.shadcn-svelte components.`;
 
       // Define the response schema using Gemini's schema format
       const schema = {
