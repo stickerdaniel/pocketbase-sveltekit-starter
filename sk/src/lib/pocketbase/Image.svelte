@@ -8,12 +8,14 @@
     file,
     thumb = "100x100",
     fallback = "internal",
+    class: className = "",
     ...rest
   }: {
     record: any;
     file: string;
     thumb?: string;
     fallback?: "internal" | "external";
+    class?: string;
   } = $props();
   const src = $derived(
     file
@@ -24,5 +26,4 @@
   );
 </script>
 
-<!-- svelte-ignore a11y-missing-attribute -->
-<img {...rest} {src} rel="noreferrer" />
+<img {...rest} {src} class={className} />
