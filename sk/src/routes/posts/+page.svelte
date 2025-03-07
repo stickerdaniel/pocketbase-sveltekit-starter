@@ -142,7 +142,7 @@
 </script>
 
 <SidebarPage title="Posts">
-  <div class="flex min-h-full flex-col">
+  <div class="flex min-h-[calc(100vh-6rem)] flex-col">
     <div class="mb-6 flex items-center justify-between">
       <h1 class="text-2xl font-bold">Blog Posts</h1>
       <div class="flex space-x-2">
@@ -191,7 +191,7 @@
     </div>
 
     <div
-      class="grid flex-1 auto-rows-fr gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      class="grid auto-rows-[minmax(min-content,_1fr)] gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
     >
       {#each $posts.items as item}
         {@const [file] = item.files}
@@ -242,7 +242,7 @@
       {/each}
     </div>
 
-    <div class="mt-6">
+    <div class="mt-auto pt-6">
       <Paginator store={posts} showIfSinglePage={true} />
     </div>
   </div>
