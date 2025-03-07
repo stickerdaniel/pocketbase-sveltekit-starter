@@ -192,7 +192,9 @@
     </div>
   </div>
 
-  <div class="grid auto-rows-fr gap-6 md:grid-cols-2 lg:grid-cols-3">
+  <div
+    class="grid auto-rows-fr gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+  >
     {#each $posts.items as item}
       {@const [file] = item.files}
       <a href={`${base}/posts/${item.slug || item.id}`} class="group block">
