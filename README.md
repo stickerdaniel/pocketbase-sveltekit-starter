@@ -7,7 +7,7 @@ This is a high-performance frontend+backend combination, since frontend
 is static and the backend is a single compiled Golang binary (JAMstack).
 The UI is built using https://next.shadcn-svelte.com/ components.
 
-##Features
+## Features
 - create & manage user accounts
 - create posts (images + markdown)
 - generate dummy posts using Gemini API
