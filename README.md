@@ -4,7 +4,11 @@ Use this app as a starting point for your own _customized_
 [PocketBase](https://github.com/pocketbase/pocketbase) backend
 with [SvelteKit](https://kit.svelte.dev) frontend.
 This is a high-performance frontend+backend combination, since frontend
-is static and backend is a single compiled Golang binary (JAMstack baby!).
+is static and the backend is a single compiled Golang binary (JAMstack).
+The UI is built using https://next.shadcn-svelte.com/ components.
+- create & manage user accounts
+- create posts (images + markdown)
+- generate dummy posts using Gemini API
 
 - SvelteKit frontend is fully static, client-side only, so that here is no need
   for NodeJS at runtime. It is generated using
