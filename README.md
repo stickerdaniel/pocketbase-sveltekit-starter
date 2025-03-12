@@ -6,10 +6,12 @@ with [SvelteKit](https://kit.svelte.dev) frontend.
 This is a high-performance frontend+backend combination, since frontend
 is static and the backend is a single compiled Golang binary (JAMstack).
 The UI is built using https://next.shadcn-svelte.com/ components.
+##Features
 - create & manage user accounts
 - create posts (images + markdown)
 - generate dummy posts using Gemini API
 
+## Stack
 - SvelteKit frontend is fully static, client-side only, so that here is no need
   for NodeJS at runtime. It is generated using
   [`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static)
@@ -33,6 +35,7 @@ The UI is built using https://next.shadcn-svelte.com/ components.
   - Hot Module Reloading (HMR) of your frontend app when you edit Svelte code (including proxying requests to the PocketBase backend via `vite`)
   - Hot reloading (restarting) of the PocketBase server using `modd` when you edit Go code
   - Hot reloading (restarting) of the PocketBase server when JS code is changed in `./pb/pb_hooks`
+  - VS Code tasks
 
 To understand the backend, see [./pb/README.md](./pb/README.md) ("pb" == PocketBase)
 To understand the frontend, see [./sk/README.md](./sk/README.md) ("sk" == SvelteKit)
