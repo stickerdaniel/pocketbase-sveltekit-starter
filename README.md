@@ -11,6 +11,7 @@ The UI is built using https://next.shadcn-svelte.com/ components.
 - create & manage user accounts
 - create posts (images + markdown)
 - generate dummy posts using Gemini API
+
 ![CleanShot 2025-03-20 at 12 09 38@2x](https://github.com/user-attachments/assets/bac8bfdf-c121-4125-b9a6-549daa6bb965)
 ![CleanShot 2025-03-20 at 12 09 19@2x](https://github.com/user-attachments/assets/626e1e9a-1817-4f48-8b7b-961ab1876e36)
 
