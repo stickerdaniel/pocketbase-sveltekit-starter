@@ -3,9 +3,9 @@
 Use this app as a starting point for your own _customized_
 [PocketBase](https://github.com/pocketbase/pocketbase) backend
 with [SvelteKit](https://kit.svelte.dev) frontend.
-This is a high-performance frontend+backend combination, since frontend
-is static and the backend is a single compiled Golang binary (JAMstack).
-The UI is built using https://next.shadcn-svelte.com/ components.
+This is a high-performance frontend+backend combination, since the frontend
+The backend is static and a single compiled Golang binary (JAMstack).
+The UI is built using https://next.shadcn-svelte.com/ components. Forked from https://github.com/spinspire/pocketbase-sveltekit-starter
 
 ## Features
 - create & manage user accounts
@@ -21,9 +21,9 @@ The UI is built using https://next.shadcn-svelte.com/ components.
   [`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static)
   and `ssr` is OFF.
 - PocketBase provides complete (and _fast_) backend including:
-  - databse (SQLite)
+  - database (SQLite)
   - CRUD API for database
-  - realtime subscriptions for LIVE data (server push to browser)
+  - real-time subscriptions for LIVE data (server push to browser)
   - Authentication and Authorization (email + social login/oauth2)
   - file storage (local filesystem or S3)
   - Extend with hooks and API endpoints in ...
@@ -31,7 +31,7 @@ The UI is built using https://next.shadcn-svelte.com/ components.
       See the example [main.pb.ts](./pb/pb_hooks/main.pb.ts).
     - OR [Golang](https://pocketbase.io/docs/go-overview/) for full performance
       See `main.go`
-- PocketBase can be downloaded as binary, and yet be extended with JavaScript.
+- PocketBase can be downloaded as binary and extended with JavaScript.
   But if you want to extend it with custom Golang code then code is included
   to compile it locally with extensions such as custom endpoints (e.g. `/api/hello`)
   and database event hooks (e.g. executing Go handler functions when a database row is created)
